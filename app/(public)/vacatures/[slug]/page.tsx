@@ -1,26 +1,27 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { PublicLayout } from '@/components/public/PublicLayout'
+import { getPublicJob } from '@/lib/data/vacancies'
 import { JobDetailPage } from './_components/JobDetailPage'
-import { findJob, jobs } from '@/lib/data/site'
+
+export const dynamic = 'force-dynamic'
 
 interface JobDetailRouteProps {
   params: Promise<{ slug: string }>
 }
 
-export function generateStaticParams() {
-  return jobs.map((j) => ({ slug: j.slug }))
-}
-
 export async function generateMetadata({ params }: JobDetailRouteProps): Promise<Metadata> {
-  const job = findJob((await params).slug)
+  const job = await getPublicJob((await params).slug)
+  if (!job) return { title: 'Vacature niet gevonden' }
   return {
     title: `${job.title} | Vacature`,
-    description: `Solliciteer direct op deze vacature als ${job.title} bij ${job.company} in ${job.city}.`,
+    description: `${job.title} bij ${job.company} in ${job.city}. ${job.description.slice(0, 140)}`,
   }
 }
 
 export default async function JobDetailRoute({ params }: JobDetailRouteProps) {
-  const job = findJob((await params).slug)
+  const job = await getPublicJob((await params).slug)
+  if (!job) notFound()
   return (
     <PublicLayout>
       <JobDetailPage job={job} />

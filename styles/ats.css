@@ -63,7 +63,7 @@
   & .bar { flex: 1; background: linear-gradient(180deg, var(--lime), #e9ffc0); border-radius: 6px 6px 0 0; position: relative }
   & .bar span { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #7c8b9b }
   & .donut { width: 160px; height: 160px; border-radius: 50%; margin: 10px auto; background: conic-gradient(var(--navy) 0 32%, #2f6ff2 32% 58%, #7da5ff 58% 76%, #ffbc58 76% 86%, #dfe6ed 86%); position: relative }
-  & .donut:after { content: "67\A totaal"; white-space: pre; display: grid; place-items: center; position: absolute; inset: 33px; background: #fff; border-radius: 50%; font-weight: 900; text-align: center }
+  & .donut:after { content: attr(data-total) "\A totaal"; white-space: pre; display: grid; place-items: center; position: absolute; inset: 33px; background: #fff; border-radius: 50%; font-weight: 900; text-align: center }
   & .legend { display: grid; gap: 8px; font-size: 13px }
   & .legend div { display: flex; justify-content: space-between }
   & .progress-list { display: grid; gap: 12px }

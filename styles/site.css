@@ -219,6 +219,29 @@
   & .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px }
   & .modal-close { width: 38px; height: 38px; border: none; background: var(--soft); border-radius: 50%; cursor: pointer }
 
+  /* afwijking: formulierstatussen (niet in het design), op basis van .open-cta en design-tokens */
+  & .form-success { display: flex; gap: 14px; align-items: flex-start; border-radius: 16px; background: linear-gradient(90deg, #efffd0, #f8ffed); border: 1px solid #dcf8a9; padding: 22px }
+  & .form-success h3 { margin-bottom: 6px }
+  & .form-success p { color: var(--muted); font-size: 14px }
+  & .form-success-icon { width: 42px; height: 42px; flex: none; border-radius: 10px; background: var(--lime); color: var(--navy); display: grid; place-items: center; font-weight: 950 }
+  & .form-error { margin-top: 14px; color: #ae3f3a; font-size: 13px; font-weight: 700 }
+  & .field-error { display: block; margin-top: 5px; color: #ae3f3a; font-size: 12px; font-weight: 700 }
+  & .form-control.has-error { border-color: #e45b5b }
+  & .file-control { height: auto; padding: 11px 12px }
+  & .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0 }
+  & .btn:disabled { opacity: .6; cursor: wait; transform: none }
+  & .approach.cols-4 { grid-template-columns: repeat(4, 1fr) }
+  & .services-grid.cols-3 { grid-template-columns: repeat(3, 1fr) }
+  @media (max-width: 840px) {
+    & .approach.cols-4 { grid-template-columns: 1fr 1fr }
+    & .services-grid.cols-3 { grid-template-columns: 1fr }
+  }
+  /* afwijking: lange keuzelijsten mogen formulieren niet breder maken dan het scherm */
+  & .forms-grid > *, & .form-grid > * { min-width: 0 }
+  & .alert-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+  & .alert-inline .form-error { flex-basis: 100%; margin-top: 0 }
+  & .form-intro { font-size: 13px; color: var(--muted); margin: -8px 0 16px }
+
   /* afwijking: tekstpagina's die niet in het design staan (privacy, over ons, contact) */
   & .prose-block { max-width: 760px }
   & .prose-block h3 { margin: 28px 0 12px }

@@ -1,7 +1,5 @@
-'use client'
-
 import { PageHero } from '@/components/public/PageHero'
-import { useSiteUI } from '@/components/public/SiteUI'
+import { ContactForm } from '@/components/public/CandidateForms'
 
 const details = [
   { icon: '⌂', title: 'Bezoekadres', text: 'The Move Maker, Apeldoorn' },
@@ -11,14 +9,12 @@ const details = [
 ]
 
 export function ContactPage() {
-  const { toast } = useSiteUI()
-
   return (
     <>
       <PageHero
         eyebrow="Neem contact op"
         title="Contact"
-        subtitle="Heb je een vraag? Wij helpen je graag. Vul het formulier in of neem direct contact op via telefoon of e-mail."
+        subtitle="Heb je een vraag? Wij helpen je graag. Vul het formulier in of neem contact op via telefoon of e-mail."
       />
       <div className="forms-zone">
         <div className="container forms-grid">
@@ -32,22 +28,11 @@ export function ContactPage() {
               </a>
             ))}
           </div>
-          <form className="form-card" onSubmit={(e) => { e.preventDefault(); e.currentTarget.reset(); toast('Bericht verstuurd') }}>
+          <div className="form-card">
             <h3>Stuur ons een bericht</h3>
             <p className="sub">We reageren binnen één werkdag.</p>
-            <div className="form-grid">
-              <div className="field"><label>Voornaam *</label><input className="form-control" required /></div>
-              <div className="field"><label>Achternaam *</label><input className="form-control" required /></div>
-              <div className="field"><label>E-mailadres *</label><input className="form-control" type="email" required /></div>
-              <div className="field"><label>Telefoonnummer</label><input className="form-control" type="tel" /></div>
-              <div className="field full">
-                <label>Onderwerp</label>
-                <select className="form-control"><option>Ik zoek een baan</option><option>Ik zoek personeel</option><option>Recruitment marketing</option><option>Overig</option></select>
-              </div>
-              <div className="field full"><label>Bericht *</label><textarea className="form-control" rows={5} required /></div>
-            </div>
-            <button className="btn btn-primary" style={{ marginTop: 16 }} type="submit">Verstuur bericht →</button>
-          </form>
+            <ContactForm />
+          </div>
         </div>
       </div>
     </>

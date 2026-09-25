@@ -2,8 +2,13 @@
 
 import { createContext, useContext } from 'react'
 
+export interface PublishTarget {
+  id: string
+  title: string
+}
+
 export interface AdminUI {
-  openPublish: () => void
+  openPublish: (vacancy: PublishTarget) => void
   openNew: () => void
   toast: (message: string) => void
 }

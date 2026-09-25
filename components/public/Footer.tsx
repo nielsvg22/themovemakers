@@ -24,6 +24,7 @@ export function Footer() {
             <Link href={sectorHref('Bouw')}>Bouw</Link>
             <Link href={sectorHref('Civiel')}>Civiel</Link>
             <Link href={sectorHref('Techniek')}>Techniek</Link>
+            <Link href="/cv-check">Laat je cv checken</Link>
             <a href="/open-sollicitatie" onClick={(e) => { e.preventDefault(); openModal('application') }}>Open sollicitatie</a>
           </div>
           <div>

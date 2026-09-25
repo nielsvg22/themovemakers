@@ -3,7 +3,9 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { AdminUIContext } from './AdminUI'
+import type { JobBoardChannel } from '@prisma/client'
+import { AdminUIContext, type PublishTarget } from './AdminUI'
+import { publishToChannels } from '@/app/admin/actions'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin' },
@@ -21,13 +23,13 @@ const navigation = [
   { name: 'Instellingen', href: '/admin/instellingen' },
 ]
 
-const boards = [
-  { name: 'Eigen website', note: 'Direct publiceren', connected: true },
-  { name: 'Google for Jobs', note: 'Automatisch via structured data', connected: true },
-  { name: 'LinkedIn', note: 'Verbonden', connected: true },
-  { name: 'Indeed', note: 'Verbonden', connected: true },
-  { name: 'Nationale Vacaturebank', note: 'Niet gekoppeld', connected: false },
-  { name: 'Jobbird', note: 'Niet gekoppeld', connected: false },
+const boards: { key: JobBoardChannel; name: string; note: string; connected: boolean }[] = [
+  { key: 'EIGEN_WEBSITE', name: 'Eigen website', note: 'Direct publiceren', connected: true },
+  { key: 'GOOGLE_FOR_JOBS', name: 'Google for Jobs', note: 'Automatisch via structured data', connected: true },
+  { key: 'LINKEDIN', name: 'LinkedIn', note: 'Testmodus (API-koppeling nodig)', connected: true },
+  { key: 'INDEED', name: 'Indeed', note: 'Testmodus (API-koppeling nodig)', connected: true },
+  { key: 'NATIONALE_VACATUREBANK', name: 'Nationale Vacaturebank', note: 'Niet gekoppeld', connected: false },
+  { key: 'JOBBIRD', name: 'Jobbird', note: 'Niet gekoppeld', connected: false },
 ]
 
 const newActions = [
@@ -42,7 +44,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [publishOpen, setPublishOpen] = useState(false)
+  const [publishTarget, setPublishTarget] = useState<PublishTarget | null>(null)
+  const [publishing, setPublishing] = useState(false)
+  const publishOpen = publishTarget !== null
+  const setPublishOpen = (open: boolean) => !open && setPublishTarget(null)
   const [newOpen, setNewOpen] = useState(false)
   const [selected, setSelected] = useState(() => boards.map((b) => b.connected))
   const [toastMessage, setToastMessage] = useState('')
@@ -61,13 +66,25 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const isActive = (href: string) => (href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`))
   const selectedCount = selected.filter(Boolean).length
 
-  const publish = () => {
-    setPublishOpen(false)
-    toast(`Vacature staat klaar voor publicatie op ${selectedCount} kanalen.`)
+  const publish = async () => {
+    if (!publishTarget) return
+    setPublishing(true)
+    try {
+      const channels = boards.filter((b, i) => selected[i] && b.connected).map((b) => b.key)
+      const results = await publishToChannels(publishTarget.id, channels)
+      const ok = results.filter((r) => r.success).length
+      toast(`${publishTarget.title}: ${ok} van ${results.length} kanalen gepubliceerd${ok < results.length ? ' (zie Publicaties)' : ''}.`)
+      setPublishTarget(null)
+      router.refresh()
+    } catch {
+      toast('Publiceren mislukt. Probeer het opnieuw.')
+    } finally {
+      setPublishing(false)
+    }
   }
 
   return (
-    <AdminUIContext.Provider value={{ openPublish: () => setPublishOpen(true), openNew: () => setNewOpen(true), toast }}>
+    <AdminUIContext.Provider value={{ openPublish: setPublishTarget, openNew: () => setNewOpen(true), toast }}>
       <div className="tmm-ats">
         <div className="app">
           <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
@@ -104,7 +121,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <div className="modal-head">
               <div>
                 <h2 id="publish-title">Publiceer vacature</h2>
-                <p style={{ margin: '4px 0 0', color: 'var(--muted)' }}>Kies op welke kanalen je deze vacature wilt plaatsen.</p>
+                <p style={{ margin: '4px 0 0', color: 'var(--muted)' }}>{publishTarget?.title}: kies op welke kanalen je deze vacature wilt plaatsen.</p>
               </div>
               <button className="close" onClick={() => setPublishOpen(false)} aria-label="Sluiten">×</button>
             </div>
@@ -127,7 +144,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 9, marginTop: 20 }}>
               <button className="btn ghost" onClick={() => setPublishOpen(false)}>Annuleren</button>
-              <button className="btn primary" onClick={publish} disabled={!selectedCount}>Publiceer op {selectedCount} kanalen</button>
+              <button className="btn primary" onClick={publish} disabled={!selectedCount || publishing}>{publishing ? 'Bezig…' : `Publiceer op ${selectedCount} kanalen`}</button>
             </div>
           </div>
         </div>

@@ -4,11 +4,19 @@ import { useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { JobCard } from '@/components/public/JobCard'
 import { ActionButton } from '@/components/public/ActionButton'
-import { jobCategories, jobs } from '@/lib/data/site'
+import { JobAlertForm } from '@/components/public/CandidateForms'
+import { FitCheckBlock } from '@/components/public/CandidateBlocks'
+import type { Job } from '@/lib/data/site'
 
-const locations = ['Apeldoorn', 'Utrecht', 'Rotterdam']
+interface VacancyBrowserProps {
+  jobs: Job[]
+  sectors: string[]
+  counts: Record<string, number>
+}
 
-export function VacancyBrowser() {
+export function VacancyBrowser({ jobs, sectors, counts }: VacancyBrowserProps) {
+  const jobCategories = [{ name: 'Alle vacatures', filter: 'Alle' }, ...sectors.map((s) => ({ name: s, filter: s }))]
+  const locations = Array.from(new Set(jobs.map((j) => j.city))).sort()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -41,7 +49,7 @@ export function VacancyBrowser() {
       return [...list].sort((a, b) => max(b.salary) - max(a.salary))
     }
     return list
-  }, [filter, query, location, sort])
+  }, [jobs, filter, query, location, sort])
 
   return (
     <section>
@@ -59,16 +67,14 @@ export function VacancyBrowser() {
                 onClick={() => selectFilter(c.filter)}
                 onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), selectFilter(c.filter))}
               >
-                <span>{c.name}</span><span>{c.count}</span>
+                <span>{c.name}</span><span>{counts[c.filter] ?? 0}</span>
               </div>
             ))}
           </div>
           <div className="alert-card">
             <h4>Ontvang nieuwe vacatures</h4>
             <p>Stel een vacature-alert in en ontvang de nieuwste vacatures in je inbox.</p>
-            <select className="form-control" aria-label="Vakgebied"><option>Bouw</option><option>Civiel</option><option>Techniek</option></select>
-            <input className="form-control" type="email" placeholder="E-mailadres" aria-label="E-mailadres" />
-            <ActionButton className="btn btn-primary btn-sm" style={{ width: '100%' }} toast="Vacature-alert ingesteld">Houd mij op de hoogte →</ActionButton>
+            <JobAlertForm sectors={sectors} />
           </div>
         </aside>
 
@@ -90,10 +96,11 @@ export function VacancyBrowser() {
           <div className="job-list">
             {filtered.length ? filtered.map((j) => <JobCard key={j.slug} job={j} />) : <div className="empty-jobs">Geen vacatures gevonden.</div>}
           </div>
-          <div className="open-cta">
+          <FitCheckBlock />
+          <div className="open-cta" style={{ marginTop: 12, background: '#fff', borderColor: 'var(--line)' }}>
             <div>
               <h3>Staat jouw ideale vacature er niet tussen?</h3>
-              <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 5 }}>Laat je gegevens achter en we nemen contact met je op zodra we iets passends hebben.</p>
+              <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 5 }}>Doe een open sollicitatie. We kijken eerst of je profiel aansluit op onze vacatures en opdrachtgevers.</p>
             </div>
             <ActionButton className="btn btn-dark btn-sm" open="application">Open sollicitatie →</ActionButton>
           </div>
