@@ -3,11 +3,11 @@ import { PublicLayout } from '@/components/public/PublicLayout'
 import { RecruitmentScanPage } from './_components/RecruitmentScanPage'
 
 export const metadata: Metadata = {
-  title: 'Gratis recruitmentscan | The Move Maker',
+  title: 'Gratis recruitmentscan',
   description: 'Laat gratis je vacature scannen. We kijken naar doelgroep, bereik en aanpak. Geen verplichtingen, wel concreet advies.',
 }
 
-export default function RecruitmentScanPage() {
+export default function RecruitmentScanRoute() {
   return (
     <PublicLayout>
       <RecruitmentScanPage />

@@ -1,5 +1,6 @@
 import { EigenWebsiteConnector, GoogleForJobsConnector, LinkedInConnector, IndeedConnector, NationaleVacaturebankConnector } from '@/lib/jobboards/connectors'
-import { JobBoardChannel, VacancyStatus, ContractType, WorkMode } from '@prisma/client'
+import { JobBoardConnectorRegistry } from '@/lib/jobboards/base-connector'
+import { JobBoardChannel, VacancyStatus, ContractType, WorkMode, type VacancyPublication } from '@prisma/client'
 
 const mockVacancy = {
   id: 'test-vacancy-1',
@@ -53,16 +54,16 @@ describe('JobBoard Connectors', () => {
       expect(result.errors).toContain('Veld "title" is verplicht voor Eigen website')
     })
 
-    it('builds correct payload', () => {
-      const payload = connector.buildPayload(mockVacancy)
+    it('builds correct payload', async () => {
+      const { payload } = await connector.dryRun(mockVacancy)
       expect(payload.title).toBe('Uitvoerder Bouw')
       expect(payload.company).toBe('BAM')
       expect(payload.location).toBe('Utrecht, Nederland')
     })
 
     it('publishes successfully', async () => {
-      const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.EIGEN_WEBSITE, mode: JobBoardChannel.TEST, status: JobBoardChannel.CONCEPT }
-      const result = await connector.publish(mockVacancy, publication as any)
+      const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.EIGEN_WEBSITE, mode: 'TEST', status: 'CONCEPT' }
+      const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
       expect(result.success).toBe(true)
       expect(result.externalJobId).toBeDefined()
       expect(result.url).toContain('/vacatures/')
@@ -84,12 +85,12 @@ describe('JobBoard Connectors', () => {
       expect(result.errors.some(e => e.includes('salaryMin') || e.includes('salaryMax'))).toBe(true)
     })
 
-    it('builds schema.org JobPosting payload', () => {
-      const payload = connector.buildPayload(mockVacancy)
+    it('builds schema.org JobPosting payload', async () => {
+      const { payload } = await connector.dryRun(mockVacancy)
       expect(payload['@context']).toBe('https://schema.org')
       expect(payload['@type']).toBe('JobPosting')
       expect(payload.title).toBe('Uitvoerder Bouw')
-      expect(payload.hiringOrganization.name).toBe('BAM')
+      expect((payload.hiringOrganization as { name: string }).name).toBe('BAM')
       expect(payload.baseSalary).toBeDefined()
     })
   })
@@ -104,14 +105,14 @@ describe('JobBoard Connectors', () => {
 
     it('publishes in test mode successfully', async () => {
       const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.LINKEDIN, mode: 'TEST', status: 'CONCEPT' }
-      const result = await connector.publish(mockVacancy, publication as any)
+      const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
       expect(result.success).toBe(true)
       expect(result.rawResponse?.testMode).toBe(true)
     })
 
     it('fails in production mode without credentials', async () => {
       const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.LINKEDIN, mode: 'PRODUCTIE', status: 'CONCEPT' }
-      const result = await connector.publish(mockVacancy, publication as any)
+      const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
       expect(result.success).toBe(false)
       expect(result.errors).toContain('LinkedIn API credentials niet geconfigureerd')
     })
@@ -127,7 +128,7 @@ describe('JobBoard Connectors', () => {
 
     it('publishes in test mode successfully', async () => {
       const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.INDEED, mode: 'TEST', status: 'CONCEPT' }
-      const result = await connector.publish(mockVacancy, publication as any)
+      const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
       expect(result.success).toBe(true)
       expect(result.rawResponse?.testMode).toBe(true)
     })
@@ -143,9 +144,16 @@ describe('JobBoard Connectors', () => {
 
     it('always fails publish when not connected', async () => {
       const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.NATIONALE_VACATUREBANK, mode: 'TEST', status: 'CONCEPT' }
-      const result = await connector.publish(mockVacancy, publication as any)
+      const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
       expect(result.success).toBe(false)
       expect(result.errors[0]).toContain('niet gekoppeld')
     })
+  })
+})
+describe('JobBoardConnectorRegistry', () => {
+  it('registers all connectors when the connectors module is loaded', () => {
+    expect(JobBoardConnectorRegistry.get(JobBoardChannel.EIGEN_WEBSITE)).toBeInstanceOf(EigenWebsiteConnector)
+    expect(JobBoardConnectorRegistry.get(JobBoardChannel.LINKEDIN)).toBeInstanceOf(LinkedInConnector)
+    expect(JobBoardConnectorRegistry.getAll()).toHaveLength(9)
   })
 })

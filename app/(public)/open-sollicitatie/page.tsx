@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Staat jouw ideale vacature er nog niet tussen? Laat je gegevens achter en we nemen contact met je op zodra we iets passends hebben in bouw, civiel of techniek.',
 }
 
-export default function OpenSollicitatiePage() {
+export default function OpenSollicitatieRoute() {
   return (
     <PublicLayout>
       <OpenSollicitatiePage />

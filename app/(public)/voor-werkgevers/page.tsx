@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Moeite om de juiste mensen te vinden? Wij helpen organisaties in bouw, civiel en techniek aan de juiste vakspecialisten. Niet alleen door te zoeken, maar door jouw werkgeversverhaal en vacatures zichtbaar te maken.',
 }
 
-export default function WerkgeversPage() {
+export default function WerkgeversRoute() {
   return (
     <PublicLayout>
       <EmployerPage />

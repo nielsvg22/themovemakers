@@ -1,27 +1,29 @@
-'use client'
-
 import { Metadata } from 'next'
 import { PublicLayout } from '@/components/public/PublicLayout'
 import { JobDetailPage } from './_components/JobDetailPage'
+import { findJob, jobs } from '@/lib/data/site'
 
-interface JobDetailPageProps {
+interface JobDetailRouteProps {
   params: Promise<{ slug: string }>
 }
 
-export async function generateMetadata({ params }: JobDetailPageProps): Promise<Metadata> {
-  const { slug } = await params
-  const title = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+export function generateStaticParams() {
+  return jobs.map((j) => ({ slug: j.slug }))
+}
+
+export async function generateMetadata({ params }: JobDetailRouteProps): Promise<Metadata> {
+  const job = findJob((await params).slug)
   return {
-    title: `${title} | Vacature`,
-    description: `Solliciteer direct op deze vacature als ${title}. Bekijk alle details, eisen en aanbod.`,
+    title: `${job.title} | Vacature`,
+    description: `Solliciteer direct op deze vacature als ${job.title} bij ${job.company} in ${job.city}.`,
   }
 }
 
-export default async function JobDetailPageRoute({ params }: JobDetailPageProps) {
-  const { slug } = await params
+export default async function JobDetailRoute({ params }: JobDetailRouteProps) {
+  const job = findJob((await params).slug)
   return (
     <PublicLayout>
-      <JobDetailPage slug={slug} />
+      <JobDetailPage job={job} />
     </PublicLayout>
   )
 }

@@ -5,11 +5,9 @@ import { cn } from '@/lib/utils'
 interface TableProps {
   children: React.ReactNode
   className?: string
-  striped?: boolean
-  hover?: boolean
 }
 
-export function Table({ children, className, striped, hover }: TableProps) {
+export function Table({ children, className }: TableProps) {
   return (
     <div className="overflow-x-auto">
       <table className={cn('w-full border-collapse', className)}>

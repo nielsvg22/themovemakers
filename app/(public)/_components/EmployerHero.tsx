@@ -1,39 +1,38 @@
-'use client'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import { ActionButton } from '@/components/public/ActionButton'
+import { images } from '@/lib/data/site'
 
-import { Button } from '@/components/ui/Button'
+interface EmployerHeroProps {
+  /** Op de werkgeverspagina is dit de paginatitel (h1), op de homepage een h2. */
+  asPageTitle?: boolean
+  title?: ReactNode
+  text?: ReactNode
+}
 
-export function EmployerHero() {
+export function EmployerHero({
+  asPageTitle,
+  title = 'De juiste mensen. Voor vandaag én morgen.',
+  text = 'Wij helpen bedrijven in bouw, civiel, techniek en meer aan vakspecialisten. Niet alleen door te werven, maar ook door jouw vacatures zichtbaar te maken met slimme recruitment marketing.',
+}: EmployerHeroProps) {
   return (
-    <section className="py-24 bg-navy text-white relative overflow-hidden" aria-labelledby="employer-title">
-      <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-lime/80 mb-4">Voor werkgevers</p>
-            <h2 id="employer-title" className="font-black tracking-tight text-3xl md:text-4xl mb-6">
-              De juiste mensen. Voor vandaag én morgen.
-            </h2>
-            <p className="text-[#c8d6dd] text-lg max-w-2xl mb-8">
-              Wij helpen bedrijven in bouw, civiel, techniek en meer aan vakspecialisten.
-              Niet alleen door te werven, maar ook door jouw vacatures zichtbaar te maken met slimme recruitment marketing.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button size="lg" asChild>
-                <a href="/gratis-recruitmentscan">Bespreek mijn vacature →</a>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a href="/voor-werkgevers">Bekijk onze diensten →</a>
-              </Button>
-            </div>
-          </div>
-          <div className="relative rounded-3xl overflow-hidden aspect-[4/3] max-w-lg mx-auto lg:mx-0">
-            <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=85"
-              alt="Team samenwerken"
-              className="w-full h-full object-cover"
-            />
+    <div className="employer-hero">
+      <div className="container grid">
+        <div>
+          <div className="eyebrow light">Voor werkgevers</div>
+          {asPageTitle ? <h1 style={{ fontSize: 58 }}>{title}</h1> : <h2>{title}</h2>}
+          <p>{text}</p>
+          <div className="hero-ctas">
+            <ActionButton open="scan">Bespreek mijn vacature →</ActionButton>
+            {asPageTitle ? (
+              <ActionButton className="btn btn-outline" toast="Kennismaking aangevraagd">Plan een kennismaking →</ActionButton>
+            ) : (
+              <Link href="/voor-werkgevers" className="btn btn-outline">Bekijk onze diensten →</Link>
+            )}
           </div>
         </div>
+        <div className="photo"><img src={images.team} alt="" /></div>
       </div>
-    </section>
+    </div>
   )
 }

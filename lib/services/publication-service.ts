@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/db/prisma'
 import { JobBoardConnectorRegistry } from '@/lib/jobboards/base-connector'
-import { JobBoardChannel, PublicationMode, PublicationStatus, VacancyStatus } from '@prisma/client'
+// Registreert alle connectors in de registry (side effect).
+import '@/lib/jobboards/connectors'
+import { JobBoardChannel, Prisma, PublicationMode } from '@prisma/client'
 import { VacancyWithRelations } from '@/types'
 
 export class PublicationService {
@@ -51,12 +53,12 @@ export class PublicationService {
           await prisma.vacancyPublication.update({
             where: { id: publication.id },
             data: {
-              status: result.success ? 'LIVE' : 'FOUD',
+              status: result.success ? 'LIVE' : 'FOUT',
               externalJobId: result.externalJobId,
               sourceCode: result.sourceCode,
               publishedAt: result.success ? new Date() : null,
               errorMessage: result.errors.join(', ') || null,
-              rawResponse: result.rawResponse as any,
+              rawResponse: result.rawResponse as Prisma.InputJsonValue | undefined,
             },
           })
 
@@ -72,7 +74,7 @@ export class PublicationService {
           await prisma.vacancyPublication.update({
             where: { id: publication.id },
             data: {
-              status: 'FOUD',
+              status: 'FOUT',
               errorMessage: error instanceof Error ? error.message : 'Onbekende fout',
             },
           })
