@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef, useState } from 'react'
 import {
   applyToVacancy,
   requestKennismaking,
@@ -92,68 +91,25 @@ export function OpenSollicitatieForm({ onSuccess }: { onSuccess?: () => void }) 
   )
 }
 
-const applySteps = ['Gegevens', 'CV', 'Vragen', 'Verzenden']
-
-/** Sollicitatie op een vacature, met de stappen uit het design. */
+/** Solliciteren op een vacature: één kort formulier, alleen wat nodig is om een eerste inschatting te maken. */
 export function ApplyForm({ vacancySlug, vacancyTitle }: { vacancySlug: string; vacancyTitle: string }) {
-  const [step, setStep] = useState(0)
-  const wrap = useRef<HTMLDivElement>(null)
-  const last = step === applySteps.length - 1
-
-  // Controleer alleen de velden van de huidige stap voordat we verder gaan.
-  const next = () => {
-    const panel = wrap.current?.querySelector<HTMLElement>(`[data-step="${step}"]`)
-    const fields = panel ? Array.from(panel.querySelectorAll<HTMLInputElement>('input, select, textarea')) : []
-    if (fields.every((f) => f.reportValidity())) setStep(step + 1)
-  }
-  const panel = (i: number) => ({ 'data-step': i, className: 'form-grid', style: { display: step === i ? undefined : 'none' } })
-
   return (
-    <div ref={wrap}>
-      <div className="stepper">
-        {applySteps.map((s, i) => (
-          <div key={s} className={`stepdot${i === step ? ' active' : ''}`}><span className="dot">{i + 1}</span>{s}</div>
-        ))}
+    <ActionForm
+      action={applyToVacancy}
+      hidden={{ vacancySlug }}
+      submitLabel="Verstuur sollicitatie →"
+      successTitle="Bedankt voor je sollicitatie."
+      successText={`We hebben je sollicitatie voor ${vacancyTitle} ontvangen. We bekijken je profiel en nemen contact op als je achtergrond aansluit.`}
+    >
+      <div className="form-grid">
+        <Field name="firstName" label="Voornaam" required autoComplete="given-name" />
+        <Field name="lastName" label="Achternaam" required autoComplete="family-name" />
+        <Field name="email" label="E-mailadres" type="email" required autoComplete="email" />
+        <Field name="phone" label="Telefoonnummer" type="tel" required autoComplete="tel" />
+        <CvUpload required />
+        <Field name="motivation" label="Wil je nog iets toevoegen? (optioneel)" textarea rows={3} full />
       </div>
-      <ActionForm
-        action={applyToVacancy}
-        hidden={{ vacancySlug }}
-        successTitle="Bedankt voor je sollicitatie."
-        successText={`We hebben je sollicitatie voor ${vacancyTitle} ontvangen. We bekijken je profiel en nemen contact op als je achtergrond aansluit.`}
-        actions={(pending) => (
-          <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-            {step > 0 && <button type="button" className="btn btn-outline-dark" onClick={() => setStep(step - 1)}>← Vorige</button>}
-            {last ? (
-              <button key="submit" className="btn btn-primary" type="submit" disabled={pending}>{pending ? 'Bezig met versturen…' : 'Verstuur sollicitatie →'}</button>
-            ) : (
-              // Aparte key: anders hergebruikt React de knop als submit en verstuurt de klik op "Volgende stap" direct.
-              <button key="next" className="btn btn-primary" type="button" onClick={next}>Volgende stap →</button>
-            )}
-          </div>
-        )}
-      >
-        <div {...panel(0)}>
-          <Field name="firstName" label="Voornaam" required autoComplete="given-name" />
-          <Field name="lastName" label="Achternaam" required autoComplete="family-name" />
-          <Field name="email" label="E-mailadres" type="email" required autoComplete="email" />
-          <Field name="phone" label="Telefoonnummer" type="tel" required autoComplete="tel" />
-        </div>
-        <div {...panel(1)}>
-          <CvUpload required />
-          <Field name="linkedin" label="LinkedIn-profiel" type="url" full placeholder="https://linkedin.com/in/..." />
-        </div>
-        <div {...panel(2)}>
-          <Field name="currentRole" label="Huidige functie" />
-          <Field name="yearsExperience" label="Jaren ervaring" options={experienceOptions} />
-          <Field name="availability" label="Beschikbaarheid" options={availabilityOptions} />
-          <Field name="city" label="Woonplaats" />
-          <Field name="motivation" label="Motivatie" textarea rows={4} full />
-        </div>
-        <p className="sub" style={{ display: last ? undefined : 'none', margin: 0 }}>
-          Controleer je gegevens en verstuur je sollicitatie. We bekijken eerst je profiel en nemen contact op als je achtergrond aansluit.
-        </p>
-      </ActionForm>
-    </div>
+    </ActionForm>
   )
 }
 

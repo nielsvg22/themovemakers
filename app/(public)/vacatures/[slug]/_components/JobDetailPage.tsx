@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteUI } from '@/components/public/SiteUI'
-import { ApplyForm, CvCheckForm } from '@/components/public/CandidateForms'
-import { FitCheckBlock } from '@/components/public/CandidateBlocks'
+import { ApplyForm } from '@/components/public/CandidateForms'
 import { images, sectorHref, type Job } from '@/lib/data/site'
 
 export interface JobDetail extends Job {
@@ -50,10 +49,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 <span>{job.type}</span>
               </div>
             </div>
-            <div className="hero-ctas" style={{ marginTop: 0 }}>
-              <a className="btn btn-primary" href="#solliciteren">Solliciteer op deze vacature →</a>
-              <a className="btn btn-outline" href="#twijfel">Twijfel je? Laat je cv checken</a>
-            </div>
+            <a className="btn btn-primary" href="#solliciteren">Solliciteer op deze vacature →</a>
           </div>
         </div>
       </div>
@@ -97,7 +93,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 </>
               )}
             </div>
-            <FitCheckBlock vacancySlug={job.slug} style={{ clear: 'both' }} />
           </div>
           <aside>
             <div className="side-links">
@@ -108,7 +103,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
             </div>
             <div className="side-links">
               <h4>Niet helemaal wat je zoekt?</h4>
-              <Link className="side-link" href={`/cv-check?vacature=${job.slug}`}><span>Twijfel je? Laat je cv checken</span><span>›</span></Link>
               <Link className="side-link" href="/kennismaking"><span>Eerst kort kennismaken</span><span>›</span></Link>
               <Link className="side-link" href={sectorHref(job.sector)}><span>Bekijk alle {job.sector}-vacatures</span><span>›</span></Link>
               <button className="side-link" onClick={() => openModal('application')}><span>Doe een open sollicitatie</span><span>›</span></button>
@@ -118,15 +112,11 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       </section>
 
       <div className="forms-zone" id="solliciteren">
-        <div className="container forms-grid">
+        <div className="container" style={{ maxWidth: 760 }}>
           <div className="form-card">
-            <h3>Solliciteren op deze vacature</h3>
+            <h3>Solliciteren op {job.title}</h3>
+            <p className="sub">Binnen een minuut geregeld: je gegevens en je cv. We bekijken je profiel en nemen contact op als je achtergrond aansluit.</p>
             <ApplyForm vacancySlug={job.slug} vacancyTitle={job.title} />
-          </div>
-          <div className="form-card" id="twijfel">
-            <h3>Twijfel je of dit bij je past?</h3>
-            <p className="sub">Laat je cv checken. We kijken eerst of je ervaring aansluit op deze of een andere vacature, en nemen contact op als er een goede match is.</p>
-            <CvCheckForm vacancySlug={job.slug} />
           </div>
         </div>
       </div>
