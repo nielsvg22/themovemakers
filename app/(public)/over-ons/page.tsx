@@ -4,10 +4,10 @@ import { OverOnsPage } from './_components/OverOnsPage'
 
 export const metadata: Metadata = {
   title: 'Over ons | The Move Maker',
-  description: 'The Move Maker is de recruitment partner voor bouw, civiel en techniek. Onze missie: de juiste mensen bij de juiste plek. Persoonlijk, zichtbaar en gericht op duurzame matches.',
+  description: 'The Move Maker is de recruitmentpartner voor bouw, civiel en techniek. Persoonlijk, zichtbaar en gericht op duurzame matches.',
 }
 
-export default function OverOnsPage() {
+export default function OverOnsRoute() {
   return (
     <PublicLayout>
       <OverOnsPage />

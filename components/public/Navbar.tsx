@@ -2,9 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { Menu, X, Search, User } from 'lucide-react'
 import { useState } from 'react'
+import { Brand } from './Brand'
 
 const navigation = [
   { name: 'Vacatures', href: '/vacatures' },
@@ -16,92 +15,44 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [open, setOpen] = useState(false)
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   return (
-    <header className="sticky top-0 z-50">
-      <nav className="relative bg-navy/96 backdrop-blur-md border-b border-white/10" role="navigation" aria-label="Hoofnavigatie">
-        <div className="container mx-auto px-4">
-          <div className="flex h-20 items-center justify-between">
-            <Link href="/" className="flex items-center gap-3" aria-label="The Move Maker - Home">
-              <div className="w-10 h-10 rounded-lg bg-lime flex items-center justify-center text-navy font-black text-lg skew-x-[-7deg]">
-                M
-              </div>
-              <div className="font-black leading-[0.82] text-white text-[18px] tracking-tight">
-                THE<br />
-                <span className="text-lime">MOVE</span><br />
-                MAKER
-              </div>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-10">
-              <div className="flex items-center gap-6">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      'text-sm font-bold transition-opacity',
-                      pathname === item.href ? 'text-lime opacity-100' : 'text-white/80 hover:text-white'
-                    )}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button className="p-2 rounded-full border border-white/20 text-white hover:bg-white/10 transition-colors" aria-label="Zoeken">
-                  <Search className="w-5 h-5" />
-                </button>
-                <Link
-                  href="/voor-werkgevers"
-                  className="px-4 py-2 bg-lime text-navy font-extrabold rounded-lg text-sm hover:bg-lime-2 transition-colors hidden sm:inline-flex"
-                >
-                  Neem contact op →
-                </Link>
-              </div>
-            </div>
-
+    <div className="nav-wrap">
+      <div className="container">
+        <nav aria-label="Hoofdnavigatie">
+          <Brand />
+          <div className="nav-links">
+            {navigation.map((item) => (
+              <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : undefined}>
+                {item.name}
+              </Link>
+            ))}
+          </div>
+          <div className="nav-actions">
+            <Link href="/vacatures" className="icon-btn" aria-label="Zoek vacatures" style={{ display: 'grid', placeItems: 'center' }}>⌕</Link>
+            <Link href="/voor-werkgevers" className="btn btn-primary btn-sm">Neem contact op →</Link>
             <button
-              className="md:hidden p-2 rounded-lg text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label={mobileMenuOpen ? 'Sluiten menu' : 'Openen menu'}
+              className="icon-btn mobile-menu"
+              onClick={() => setOpen(!open)}
+              aria-expanded={open}
+              aria-controls="mobile-panel"
+              aria-label={open ? 'Menu sluiten' : 'Menu openen'}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {open ? '×' : '☰'}
             </button>
           </div>
+        </nav>
+        <div id="mobile-panel" className={`mobile-panel${open ? ' open' : ''}`}>
+          {navigation.map((item) => (
+            <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : undefined} onClick={() => setOpen(false)}>
+              {item.name}
+            </Link>
+          ))}
+          <Link href="/voor-werkgevers" className="btn btn-primary btn-sm" onClick={() => setOpen(false)}>Neem contact op →</Link>
         </div>
-
-        {mobileMenuOpen && (
-          <div id="mobile-menu" className="md:hidden bg-navy border-t border-white/10 px-4 py-6">
-            <div className="flex flex-col gap-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'px-4 py-3 rounded-lg text-lg font-bold',
-                    pathname === item.href ? 'bg-lime text-navy' : 'text-white/80 hover:text-white hover:bg-white/5'
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <Link
-                href="/voor-werkgevers"
-                className="px-4 py-3 bg-lime text-navy font-extrabold rounded-lg text-center mt-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Neem contact op →
-              </Link>
-            </div>
-          </div>
-        )}
-      </nav>
-    </header>
+      </div>
+    </div>
   )
 }

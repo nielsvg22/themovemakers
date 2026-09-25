@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import '../styles/site.css'
+import '../styles/ats.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -49,11 +51,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl" className={`${inter.variable} antialiased`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body className="min-h-screen bg-white font-sans text-ink">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }

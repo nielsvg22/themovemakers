@@ -1,37 +1,42 @@
-'use client'
-
-import { Button } from '@/components/ui/Button'
-import { PageHero } from '@/components/public/PageHero'
-import { ServicesGrid } from '@/app/(public)/_components/ServicesGrid'
-import { ApproachSteps } from '@/app/(public)/_components/ApproachSteps'
+import { ActionButton } from '@/components/public/ActionButton'
+import { EmployerHero } from '@/app/(public)/_components/EmployerHero'
+import { ServicesGrid, Service } from '@/app/(public)/_components/ServicesGrid'
 import { MarketingStrip } from '@/app/(public)/_components/MarketingStrip'
 import { CaseStudies } from '@/app/(public)/_components/CaseStudies'
+
+const services: Service[] = [
+  { icon: '◉', title: 'Recruitment', text: 'Gerichte search en persoonlijke benadering.' },
+  { icon: '◇', title: 'Werving & selectie', text: 'Van intake tot introductie van kandidaten.' },
+  { icon: '◁', title: 'Recruitment marketing', text: 'Campagnes die zorgen dat vacatures gevonden worden.' },
+  { icon: '↗', title: 'Employer branding', text: 'Maak zichtbaar waarom talent voor jouw organisatie kiest.' },
+]
 
 export function EmployerPage() {
   return (
     <>
-      <PageHero
+      <EmployerHero
+        asPageTitle
         title="Moeite om de juiste mensen te vinden?"
-        subtitle="Wij helpen organisaties in bouw, civiel en techniek aan de juiste vakspecialisten. Niet alleen door te zoeken, maar door jouw werkgeversverhaal en vacatures zichtbaar te maken."
-        eyebrow="Voor werkgevers"
-        image="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=85"
+        text="Wij helpen organisaties in bouw, civiel en techniek aan de juiste vakspecialisten. Niet alleen door te zoeken, maar door jouw werkgeversverhaal en vacatures zichtbaar te maken."
       />
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-12 max-w-3xl">
-            <h2 className="font-black tracking-tight text-3xl md:text-4xl mb-4">
-              Recruitment dat verder gaat dan zoeken
-            </h2>
-            <p className="text-muted text-lg">
-              Van positionering en campagne tot selectie en plaatsing. We maken recruitment meetbaar, persoonlijk en zichtbaar.
-            </p>
+      <section>
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <h2>Recruitment dat verder gaat dan zoeken</h2>
+              <p>Van positionering en campagne tot selectie en plaatsing. We maken recruitment meetbaar, persoonlijk en zichtbaar.</p>
+            </div>
           </div>
-          <ServicesGrid />
+          <ServicesGrid services={services} />
         </div>
       </section>
-      <ApproachSteps />
-      <MarketingStrip />
-      <CaseStudies />
+      <MarketingStrip
+        title={<><span>Van bereik</span> naar sollicitatie.</>}
+        text="We combineren doelgroepkennis, vacaturecontent en campagnes om precies de juiste mensen te bereiken."
+        cta={<ActionButton className="btn btn-primary btn-sm" open="scan">Start met een recruitmentscan →</ActionButton>}
+        lastStep="Kandidaat"
+      />
+      <CaseStudies title="Cases die laten zien wat werkt" labels={['kandidaten', 'dagen', 'plaatsing']} />
     </>
   )
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Wij zorgen dat het juiste talent je bedrijf vindt. Van doelgroepanalyse en vacatureteksten tot campagnes, sociale media en employer branding.',
 }
 
-export default function RecruitmentMarketingPage() {
+export default function RecruitmentMarketingRoute() {
   return (
     <PublicLayout>
       <RecruitmentMarketingPage />

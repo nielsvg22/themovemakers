@@ -19,12 +19,25 @@ export default function HomePage() {
   return (
     <PublicLayout>
       <Hero />
-      <SectorGrid />
-      <DualCta />
-      <PartnerLogos />
+
+      <section>
+        <div className="container">
+          <SectorGrid />
+          <DualCta />
+          <PartnerLogos />
+        </div>
+      </section>
+
       <EmployerHero />
-      <ServicesGrid />
-      <ApproachSteps />
+
+      <section>
+        <div className="container">
+          <div className="section-head"><div><h2>Waar kunnen we bij helpen?</h2></div></div>
+          <ServicesGrid />
+          <ApproachSteps />
+        </div>
+      </section>
+
       <MarketingStrip />
       <CaseStudies />
     </PublicLayout>

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Laat gratis je vacature scannen. We kijken naar doelgroep, bereik en aanpak. Geen verplichtingen, wel concreet advies.',
 }
 
-export default function RecruitmentScanPage() {
+export default function RecruitmentScanRoute() {
   return (
     <PublicLayout>
       <RecruitmentScanPage />

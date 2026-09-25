@@ -1,141 +1,61 @@
 'use client'
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table'
-import { cn } from '@/lib/utils'
-import { Plus, ExternalLink, Settings, CheckCircle, AlertCircle, Clock, Wifi, WifiOff, ChevronRight } from 'lucide-react'
+import { useAdminUI } from '@/components/admin/AdminUI'
 
 const connectors = [
-  { id: 'website', name: 'Eigen website', description: 'Publiceer direct op themovemaker.nl', status: 'connected', icon: '🌐', lastSync: '2 min geleden' },
-  { id: 'google', name: 'Google for Jobs', description: 'Via JobPosting structured data', status: 'active', icon: 'G', lastSync: '1 uur geleden' },
-  { id: 'linkedin', name: 'LinkedIn', description: 'ATS / Job Posting connector', status: 'connected', icon: 'in', lastSync: '5 min geleden' },
-  { id: 'indeed', name: 'Indeed', description: 'Job Sync API connector', status: 'connected', icon: 'i', lastSync: '3 min geleden' },
-  { id: 'nv', name: 'Nationale Vacaturebank', description: 'API/feed configuratie nog nodig', status: 'not_connected', icon: 'N', lastSync: null },
-  { id: 'jobbird', name: 'Jobbird', description: 'API/feed configuratie nog nodig', status: 'not_connected', icon: 'J', lastSync: null },
-  { id: 'monster', name: 'Monsterboard', description: 'API/feed configuratie nog nodig', status: 'not_connected', icon: 'M', lastSync: null },
-  { id: 'werkzoeken', name: 'Werkzoeken.nl', description: 'API/feed configuratie nog nodig', status: 'not_connected', icon: 'W', lastSync: null },
-  { id: 'jooble', name: 'Jooble', description: 'API/feed configuratie nog nodig', status: 'not_connected', icon: 'J', lastSync: null },
+  { name: 'Eigen website', text: 'Publiceer direct op themovemaker.nl', badge: 'b-green', status: 'Verbonden', actions: ['Instellingen'] },
+  { name: 'Google for Jobs', text: 'Via JobPosting structured data', badge: 'b-green', status: 'Actief', actions: ['Controleer markup'] },
+  { name: 'LinkedIn', text: 'ATS / Job Posting connector', badge: 'b-green', status: 'Verbonden', actions: ['Instellingen', 'Test'] },
+  { name: 'Indeed', text: 'Job Sync API connector', badge: 'b-green', status: 'Verbonden', actions: ['Instellingen', 'Test'] },
+  { name: 'Nationale Vacaturebank', text: 'API/feed configuratie nog nodig', badge: 'b-gray', status: 'Niet gekoppeld', actions: ['Koppeling instellen'] },
+  { name: 'Jobbird', text: 'API/feed configuratie nog nodig', badge: 'b-gray', status: 'Niet gekoppeld', actions: ['Koppeling instellen'] },
 ]
 
-const publications = [
-  { id: '1', vacancy: 'Uitvoerder Bouw', channel: 'LinkedIn', status: 'LIVE', externalId: 'LI-982182', publishedAt: 'Vandaag 10:45', lastSync: '2 min geleden' },
-  { id: '2', vacancy: 'Uitvoerder Bouw', channel: 'Indeed', status: 'LIVE', externalId: 'IND-37821', publishedAt: 'Vandaag 10:46', lastSync: '3 min geleden' },
-  { id: '3', vacancy: 'Projectleider Techniek', channel: 'Google for Jobs', status: 'ELIGIBLE', externalId: '—', publishedAt: 'Automatisch', lastSync: '1 uur geleden' },
-  { id: '4', vacancy: 'Werkvoorbereider Civiel', channel: 'Eigen website', status: 'LIVE', externalId: 'TMM-1245', publishedAt: 'Gisteren 14:22', lastSync: '2 uur geleden' },
-  { id: '5', vacancy: 'Calculator Bouw', channel: 'Eigen website', status: 'CONCEPT', externalId: '—', publishedAt: '—', lastSync: '—' },
+const recent = [
+  { vacancy: 'Uitvoerder Bouw', channel: 'LinkedIn', badge: 'b-green', status: 'Live', id: 'LI-982182', date: 'Vandaag 10:45', sync: '2 min geleden' },
+  { vacancy: 'Uitvoerder Bouw', channel: 'Indeed', badge: 'b-green', status: 'Live', id: 'IND-37821', date: 'Vandaag 10:46', sync: '3 min geleden' },
+  { vacancy: 'Projectleider Techniek', channel: 'Google for Jobs', badge: 'b-blue', status: 'Eligible', id: '—', date: 'Automatisch', sync: '1 uur geleden' },
 ]
 
-const statusVariants: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'gray'> = {
-  LIVE: 'success',
-  ELIGIBLE: 'info',
-  CONCEPT: 'gray',
-  IN_WACHTRIJ: 'warning',
-  FOUD: 'danger',
-  VERLOPEN: 'gray',
-  INGETROKKEN: 'gray',
+function actionClass(action: string) {
+  if (action === 'Test') return 'btn soft'
+  if (action === 'Koppeling instellen') return 'btn primary'
+  return 'btn ghost'
 }
 
-export function AdminPublicaties() {
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Publicaties & koppelingen</h1>
-          <p className="text-muted mt-1">Beheer jobboards, feeds, API-koppelingen en publicatiestatussen.</p>
-        </div>
-        <Button asChild>
-          <a href="/admin/publicaties/nieuw">Nieuwe publicatie</a>
-        </Button>
-      </div>
+export default function PublicatiesPage() {
+  const { openPublish, toast } = useAdminUI()
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {connectors.map((connector) => (
-          <Card key={connector.id}>
-            <CardHeader className="flex flex-row items-start justify-between pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-soft flex items-center justify-center font-black text-lg">
-                  {connector.icon}
-                </div>
-                <div>
-                  <CardTitle>{connector.name}</CardTitle>
-                  <p className="text-sm text-muted">{connector.description}</p>
-                </div>
-              </div>
-              <Badge variant={connector.status === 'connected' || connector.status === 'active' ? 'success' : 'gray'}>
-                {connector.status === 'connected' ? 'Verbonden' : connector.status === 'active' ? 'Actief' : 'Niet gekoppeld'}
-              </Badge>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted">Laatste sync</span>
-                <span className="font-medium">
-                  {connector.lastSync ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 inline text-green-600 mr-1" /> {connector.lastSync}
-                    </>
-                  ) : (
-                    <span className="text-muted">Nog nooit</span>
-                  )}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" className="flex-1" disabled={connector.status === 'not_connected'}>
-                  {connector.status === 'not_connected' ? 'Koppeling instellen' : 'Instellingen'}
-                </Button>
-                {(connector.status === 'connected' || connector.status === 'active') && (
-                  <Button variant="ghost" size="sm" className="px-3">
-                    Test
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+  return (
+    <>
+      <div className="page-head">
+        <div><h1>Publicaties &amp; koppelingen</h1><p>Beheer jobboards, feeds, API-koppelingen en publicatiestatussen.</p></div>
+        <button className="btn primary" onClick={openPublish}>Nieuwe publicatie</button>
+      </div>
+      <div className="grid connector-grid">
+        {connectors.map((c) => (
+          <div key={c.name} className="card connector">
+            <div className="connector-head">
+              <div><h3>{c.name}</h3><p>{c.text}</p></div>
+              <span className={`badge ${c.badge}`}>{c.status}</span>
+            </div>
+            <div className="actions">
+              {c.actions.map((a) => <button key={a} className={actionClass(a)} onClick={() => toast(`${c.name}: ${a.toLowerCase()}`)}>{a}</button>)}
+            </div>
+          </div>
         ))}
       </div>
-
-      <Card className="p-0 overflow-hidden">
-        <CardHeader className="px-6 py-4">
-          <CardTitle>Recente publicaties</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Vacature</TableHead>
-                <TableHead>Kanaal</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Extern ID</TableHead>
-                <TableHead>Publicatiedatum</TableHead>
-                <TableHead>Laatste sync</TableHead>
-                <TableHead className="w-30"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {publications.map((pub) => (
-                <TableRow key={pub.id}>
-                  <TableCell>
-                    <p className="font-medium">{pub.vacancy}</p>
-                  </TableCell>
-                  <TableCell>{pub.channel}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariants[pub.status] || 'gray'}>{pub.status}</Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{pub.externalId}</TableCell>
-                  <TableCell>{pub.publishedAt}</TableCell>
-                  <TableCell>{pub.lastSync}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm" className="p-1.5" title="Details">
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+      <div className="card panel" style={{ marginTop: 16 }}>
+        <h3>Recente publicaties</h3>
+        <table className="table">
+          <thead><tr><th>Vacature</th><th>Kanaal</th><th>Status</th><th>Extern ID</th><th>Publicatiedatum</th><th>Laatste sync</th></tr></thead>
+          <tbody>
+            {recent.map((r) => (
+              <tr key={`${r.vacancy}-${r.channel}`}><td>{r.vacancy}</td><td>{r.channel}</td><td><span className={`badge ${r.badge}`}>{r.status}</span></td><td>{r.id}</td><td>{r.date}</td><td>{r.sync}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
