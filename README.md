@@ -217,6 +217,18 @@ De designs staan in de repo als bron van waarheid:
 Pas bij designwijzigingen eerst deze CSS aan; de componenten gebruiken de klassenamen uit de designs.
 Tailwind (v4, zonder preflight) is alleen nog nodig voor de losse componenten in `components/ui/`.
 
+## ▲ Deploy op Vercel
+
+1. **Project importeren:** vercel.com → *Add New → Project* → kies `nielsvg22/themovemakers`. Framework: Next.js (automatisch). Laat build command leeg: Vercel gebruikt het script `vercel-build`.
+2. **Database:** *Storage → Create Database → Neon (Postgres)* en koppel die aan het project. Vercel zet dan `DATABASE_URL` en `DATABASE_URL_UNPOOLED`.
+3. **Environment variables** (*Settings → Environment Variables*, voor Production én Preview):
+   - `NEXTAUTH_SECRET`: willekeurige tekst van minstens 32 tekens
+   - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (min. 12 tekens), optioneel `ADMIN_NAME`
+   - `NEXTAUTH_URL` is niet nodig; NextAuth gebruikt het Vercel-adres.
+4. **Deployen:** elke build draait `prisma migrate deploy` (tabellen aanmaken/bijwerken) en maakt het admin-account aan als het nog niet bestaat. Elke branch krijgt een eigen preview-link.
+
+Schemawijziging? Maak een migratie met `npm run db:migrate` (lokaal) en commit de map `prisma/migrations`.
+
 ## 🗄 Prisma 7
 
 - De database-URL staat in `prisma.config.ts` (leest `DATABASE_URL`), niet meer in `schema.prisma`.
