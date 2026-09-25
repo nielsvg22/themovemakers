@@ -3,6 +3,7 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import type { JobBoardChannel } from '@prisma/client'
 import { AdminUIContext, type PublishTarget } from './AdminUI'
 import { publishToChannels } from '@/app/admin/actions'
@@ -35,13 +36,19 @@ const boards: { key: JobBoardChannel; name: string; note: string; connected: boo
 
 const newActions = [
   { label: 'Nieuwe vacature', href: '/admin/vacatures/nieuw' },
-  { label: 'Nieuwe kandidaat', href: '/admin/kandidaten' },
-  { label: 'Nieuw bedrijf', href: '/admin/bedrijven' },
-  { label: 'Nieuwe taak', href: '/admin/taken' },
-  { label: 'Gesprek plannen', href: '/admin/agenda' },
+  { label: 'Nieuwe kandidaat', href: '/admin/kandidaten/nieuw' },
+  { label: 'Nieuw bedrijf', href: '/admin/bedrijven#nieuw' },
+  { label: 'Nieuwe taak', href: '/admin/taken#nieuw' },
+  { label: 'Kennismaking plannen', href: '/admin/kandidaten?status=TE_BEOORDELEN' },
 ]
 
-export function AdminLayout({ children }: { children: ReactNode }) {
+interface AdminLayoutProps {
+  children: ReactNode
+  user: { name: string; role: string }
+  counts: { toReview: number; openMessages: number; openTasks: number }
+}
+
+export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -94,11 +101,17 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               {navigation.map((item) => (
                 <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : undefined} aria-current={isActive(item.href) ? 'page' : undefined} onClick={() => setSidebarOpen(false)}>
                   <span className="dot" />{item.name}
+                  {item.href === '/admin/kandidaten' && counts.toReview > 0 && <span className="nav-count">{counts.toReview}</span>}
+                  {item.href === '/admin/taken' && counts.openTasks > 0 && <span className="nav-count">{counts.openTasks}</span>}
                 </Link>
               ))}
             </nav>
             <div className="sidebar-bottom">
-              <div className="user"><div className="avatar" /><div><b>Niels van Gortel</b><small>Administrator</small></div></div>
+              <div className="user">
+                <div className="avatar" />
+                <div style={{ minWidth: 0, flex: 1 }}><b>{user.name}</b><small>{user.role}</small></div>
+                <button className="logout" onClick={() => signOut({ callbackUrl: '/login' })} title="Uitloggen" aria-label="Uitloggen">⏻</button>
+              </div>
             </div>
           </aside>
           <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
@@ -106,11 +119,17 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <main className="main">
             <div className="topbar">
               <button className="btn ghost mobile-menu" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Menu">☰</button>
-              <div className="search"><input placeholder="Zoek naar vacatures, kandidaten, bedrijven..." aria-label="Zoeken" /></div>
+              <form className="search" action="/admin/zoeken" role="search">
+                <input name="q" placeholder="Zoek naar vacatures, kandidaten, bedrijven..." aria-label="Zoeken" />
+              </form>
               <div className="top-actions">
                 <button className="btn primary" onClick={() => setNewOpen(true)}>＋ Nieuw</button>
-                <button className="btn ghost" aria-label="Notificaties">🔔</button>
-                <button className="btn ghost" aria-label="Berichten">💬</button>
+                <Link href="/admin/meldingen" className="btn ghost top-icon" aria-label={`Meldingen (${counts.toReview} te beoordelen)`}>
+                  🔔{counts.toReview > 0 && <span className="top-badge">{counts.toReview}</span>}
+                </Link>
+                <Link href="/admin/berichten" className="btn ghost top-icon" aria-label={`Berichten (${counts.openMessages} open)`}>
+                  💬{counts.openMessages > 0 && <span className="top-badge">{counts.openMessages}</span>}
+                </Link>
               </div>
             </div>
             <div className="content">{children}</div>

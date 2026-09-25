@@ -11,7 +11,7 @@ export interface VacancyRow {
   id: string
   slug: string
   title: string
-  company: string
+  company: string | null
   sector: string
   city: string
   salary: string
@@ -33,7 +33,7 @@ export function VacancyList({ vacancies, sectors }: { vacancies: VacancyRow[]; s
         (v) =>
           (!sector || v.sector === sector) &&
           (!status || v.status === status) &&
-          `${v.title} ${v.company} ${v.city}`.toLowerCase().includes(query.toLowerCase())
+          `${v.title} ${v.company ?? ''} ${v.city}`.toLowerCase().includes(query.toLowerCase())
       ),
     [vacancies, query, status, sector]
   )
@@ -71,7 +71,7 @@ export function VacancyList({ vacancies, sectors }: { vacancies: VacancyRow[]; s
             <div key={v.id} className="card job-card">
               <div>
                 <h3><Link href={`/admin/vacatures/${v.id}`} style={{ textDecoration: 'none' }}>{v.title}</Link></h3>
-                <div className="meta"><span>{v.company}</span><span>{v.city}</span><span>{v.salary}</span><span>{v.hours}</span><span>{v.applications} sollicitaties</span></div>
+                <div className="meta">{v.company && <span>{v.company}</span>}<span>{v.city}</span><span>{v.salary}</span><span>{v.hours}</span><span>{v.applications} sollicitaties</span></div>
               </div>
               <div className="job-actions" style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 <span className={`badge ${vacancyStatusBadge[v.status]}`}>{vacancyStatusLabel[v.status]}</span>

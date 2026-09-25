@@ -52,14 +52,14 @@ export function VacancyEditor({ vacancy: v, companies, sectors }: Props) {
             <div className="form-grid">
               <div className="field"><label htmlFor="title">Functietitel</label><input id="title" name="title" defaultValue={v?.title} required />{err('title')}</div>
               <div className="field">
-                <label htmlFor="companyId">Bedrijf</label>
+                <label htmlFor="companyId">Opdrachtgever (optioneel)</label>
                 <select id="companyId" name="companyId" defaultValue={v?.companyId ?? ''}>
-                  <option value="">— Nieuw bedrijf —</option>
+                  <option value="">Niet tonen</option>
                   {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
                 {err('companyId')}
               </div>
-              <div className="field"><label htmlFor="newCompany">Of nieuw bedrijf</label><input id="newCompany" name="newCompany" placeholder="Naam opdrachtgever" /></div>
+              <div className="field"><label htmlFor="newCompany">Of nieuwe opdrachtgever (optioneel)</label><input id="newCompany" name="newCompany" placeholder="Laat leeg om geen bedrijf te tonen" /></div>
               <div className="field"><label htmlFor="city">Locatie</label><input id="city" name="city" defaultValue={v?.city} required />{err('city')}</div>
               <div className="field">
                 <label htmlFor="sectorId">Vakgebied</label>

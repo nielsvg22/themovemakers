@@ -7,7 +7,7 @@ export function JobCard({ job }: { job: Job }) {
       <div className="job-thumb"><img src={job.img} alt={job.title} /></div>
       <div>
         <h3>{job.title}</h3>
-        <div className="company">{job.company}</div>
+        {job.company && <div className="company">{job.company}</div>}
         <div className="job-meta">
           <span>⌂ {job.city}</span>
           <span>{job.salary}</span>

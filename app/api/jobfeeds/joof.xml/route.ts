@@ -43,7 +43,7 @@ export async function GET() {
     <job>
       <id>${vacancy.id}</id>
       <title><![CDATA[${vacancy.title}]]></title>
-      <company><![CDATA[${vacancy.company.name}]]></company>
+      <company><![CDATA[${vacancy.company?.name ?? 'The Move Maker'}]]></company>
       <location><![CDATA[${vacancy.location}${vacancy.city ? `, ${vacancy.city}` : ''}]]></location>
       <description><![CDATA[${vacancy.description}]]></description>
       <url>${baseUrl}/vacatures/${vacancy.slug}</url>

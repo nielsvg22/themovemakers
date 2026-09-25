@@ -48,7 +48,7 @@ export default async function EditVacaturePage({ params }: { params: Promise<{ i
         vacancy={{
           id: vacancy.id,
           title: vacancy.title,
-          companyId: vacancy.companyId,
+          companyId: vacancy.companyId ?? '',
           sectorId: vacancy.sectorId,
           city: vacancy.city ?? vacancy.location,
           hoursMin: vacancy.hoursMin,

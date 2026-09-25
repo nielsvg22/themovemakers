@@ -42,7 +42,7 @@ export function VacancyBrowser({ jobs, sectors, counts }: VacancyBrowserProps) {
       (j) =>
         (filter === 'Alle' || j.sector === filter || j.title.includes(filter)) &&
         (!location || j.city === location) &&
-        `${j.title} ${j.company} ${j.city}`.toLowerCase().includes(q)
+        `${j.title} ${j.company ?? ''} ${j.city}`.toLowerCase().includes(q)
     )
     if (sort === 'Salaris') {
       const max = (s: string) => Number(s.split('-').pop()!.replace(/\D/g, ''))

@@ -41,7 +41,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
             <div>
               <h1 style={{ fontSize: 50 }}>{job.title}</h1>
               <div className="meta">
-                <span>{job.company}</span>
+                {job.company && <span>{job.company}</span>}
                 <span>📍 {job.city}</span>
                 <span>{job.salary}</span>
                 <span>{job.hours}</span>

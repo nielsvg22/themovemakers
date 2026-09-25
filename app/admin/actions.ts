@@ -137,11 +137,10 @@ export async function saveVacancy(_: VacancyFormState, formData: FormData): Prom
     const slug = generateSlug(d.newCompany)
     companyId = (await prisma.company.upsert({ where: { slug }, update: {}, create: { name: d.newCompany, slug } })).id
   }
-  if (!companyId) return { ok: false, errors: { companyId: 'Kies een bedrijf of vul een nieuwe naam in' } }
-
+  // Opdrachtgever is optioneel: zonder bedrijf toont de site geen bedrijfsnaam.
   const data = {
     title: d.title,
-    companyId,
+    companyId: companyId ?? null,
     sectorId: d.sectorId,
     location: d.city,
     city: d.city,

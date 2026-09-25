@@ -27,6 +27,10 @@ export const sourceLabel: Record<string, string> = {
   kennismaking: 'Kennismaking',
   open_sollicitatie: 'Open sollicitatie',
   sollicitatie: 'Sollicitatie',
+  handmatig: 'Handmatig',
+  linkedin: 'LinkedIn',
+  netwerk: 'Netwerk',
+  doorverwijzing: 'Doorverwijzing',
 }
 
 export const vacancyStatusLabel: Record<VacancyStatus, string> = {

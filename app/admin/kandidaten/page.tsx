@@ -40,6 +40,7 @@ export default async function KandidatenPage({ searchParams }: Props) {
     <>
       <div className="page-head">
         <div><h1>Kandidaten</h1><p>Beoordeel profielen eerst, plan daarna pas een korte kennismaking.</p></div>
+        <Link href="/admin/kandidaten/nieuw" className="btn primary">＋ Kandidaat</Link>
       </div>
       <form className="toolbar" action="/admin/kandidaten">
         {activeStatus && <input type="hidden" name="status" value={activeStatus} />}

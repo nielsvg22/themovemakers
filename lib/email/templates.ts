@@ -141,3 +141,18 @@ export function testEmail() {
     html: layout('De e-mailkoppeling werkt', p('Dit is een testmail vanuit de admin. Resend is goed ingesteld.')),
   }
 }
+
+/** Vult {{voornaam}}, {{achternaam}}, {{vacature}} etc. in een template in. */
+export function fillTemplate(text: string, vars: Record<string, string | null | undefined>) {
+  return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (m, key: string) => vars[key.toLowerCase()] ?? '')
+}
+
+/** Handgeschreven mail vanuit de admin (platte tekst → alinea's in de huisstijl). */
+export function customEmail(subject: string, body: string) {
+  const paragraphs = body
+    .trim()
+    .split(/\n{2,}/)
+    .map((para) => p(esc(para).replace(/\n/g, '<br>')))
+    .join('')
+  return { subject, html: layout(subject, paragraphs) }
+}

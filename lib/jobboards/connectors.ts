@@ -15,7 +15,7 @@ export class EigenWebsiteConnector extends BaseJobBoardConnector {
     return {
       title: vacancy.title,
       slug: vacancy.slug,
-      company: vacancy.company.name,
+      company: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       description: vacancy.description,
       responsibilities: vacancy.responsibilities,
@@ -80,8 +80,8 @@ export class GoogleForJobsConnector extends BaseJobBoardConnector {
       employmentType: this.mapContractType(vacancy.contractType),
       hiringOrganization: {
         '@type': 'Organization',
-        name: vacancy.company.name,
-        sameAs: vacancy.company.website || undefined,
+        name: (vacancy.company?.name ?? 'The Move Maker'),
+        sameAs: vacancy.company?.website || undefined,
       },
       jobLocation: {
         '@type': 'Place',
@@ -152,7 +152,7 @@ export class LinkedInConnector extends BaseJobBoardConnector {
     return {
       title: vacancy.title,
       description: vacancy.description,
-      companyName: vacancy.company.name,
+      companyName: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       salaryRange: {
         min: vacancy.salaryMin,
@@ -213,7 +213,7 @@ export class IndeedConnector extends BaseJobBoardConnector {
     return {
       jobkey: `indeed-${vacancy.id}`,
       title: vacancy.title,
-      company: vacancy.company.name,
+      company: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       description: vacancy.description,
       salary: vacancy.salaryMin && vacancy.salaryMax ? `${vacancy.salaryMin}-${vacancy.salaryMax}` : undefined,
@@ -268,7 +268,7 @@ export abstract class DisconnectedConnector extends BaseJobBoardConnector {
   protected buildPayload(vacancy: VacancyWithRelations): Record<string, unknown> {
     return {
       title: vacancy.title,
-      company: vacancy.company.name,
+      company: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       description: vacancy.description,
     }
