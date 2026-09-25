@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import type { JobBoardChannel } from '@prisma/client'
 import { AdminUIContext, type PublishTarget } from './AdminUI'
-import { publishToChannels } from '@/app/admin/actions'
+import { getVacancyChannels, publishToChannels } from '@/app/admin/actions'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin' },
@@ -64,7 +64,8 @@ export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
   const publishOpen = publishTarget !== null
   const setPublishOpen = (open: boolean) => !open && setPublishTarget(null)
   const [newOpen, setNewOpen] = useState(false)
-  const [selected, setSelected] = useState(() => boards.map((b) => b.connected))
+  const [selected, setSelected] = useState(() => boards.map(() => false))
+  const [loadingChannels, setLoadingChannels] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -78,6 +79,22 @@ export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
 
   useEffect(() => () => clearTimeout(timer.current), [])
 
+  // Laadt bij het openen de echte publicatiestatus van deze vacature, zodat de vinkjes
+  // kloppen en uitvinken ook daadwerkelijk iets intrekt. Dit gebeurt als reactie op de
+  // klik die de modal opent (niet in een effect), zodat elke open-actie een verse fetch is.
+  const openPublish = useCallback(
+    (target: PublishTarget) => {
+      setPublishTarget(target)
+      setSelected(boards.map(() => false))
+      setLoadingChannels(true)
+      getVacancyChannels(target.id)
+        .then((active) => setSelected(boards.map((b) => active.includes(b.key))))
+        .catch(() => toast('Kon de huidige publicatiestatus niet ophalen.'))
+        .finally(() => setLoadingChannels(false))
+    },
+    [toast]
+  )
+
   const isActive = (href: string) => (href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`))
   const selectedCount = selected.filter(Boolean).length
 
@@ -88,7 +105,11 @@ export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
       const channels = boards.filter((b, i) => selected[i] && b.connected).map((b) => b.key)
       const results = await publishToChannels(publishTarget.id, channels)
       const ok = results.filter((r) => r.success).length
-      toast(`${publishTarget.title}: ${ok} van ${results.length} kanalen gepubliceerd${ok < results.length ? ' (zie Publicaties)' : ''}.`)
+      toast(
+        ok === results.length
+          ? `${publishTarget.title}: publicatiestatus bijgewerkt (${selectedCount} kanalen actief).`
+          : `${publishTarget.title}: ${ok} van ${results.length} wijzigingen gelukt (zie Publicaties).`
+      )
       setPublishTarget(null)
       router.refresh()
     } catch {
@@ -99,7 +120,7 @@ export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
   }
 
   return (
-    <AdminUIContext.Provider value={{ openPublish: setPublishTarget, openNew: () => setNewOpen(true), toast }}>
+    <AdminUIContext.Provider value={{ openPublish, openNew: () => setNewOpen(true), toast }}>
       <div className="tmm-ats">
         <div className="app">
           <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
@@ -152,26 +173,32 @@ export function AdminLayout({ children, user, counts }: AdminLayoutProps) {
               </div>
               <button className="close" onClick={() => setPublishOpen(false)} aria-label="Sluiten">×</button>
             </div>
-            <div className="board-select">
-              {boards.map((b, i) => (
-                <label key={b.name} className="board">
-                  <input
-                    type="checkbox"
-                    checked={selected[i]}
-                    disabled={!b.connected}
-                    onChange={() => setSelected(selected.map((v, j) => (j === i ? !v : v)))}
-                  />
-                  <div><b>{b.name}</b><br /><small>{b.note}</small></div>
-                </label>
-              ))}
-            </div>
+            {loadingChannels ? (
+              <p style={{ color: 'var(--muted)' }}>Huidige status laden…</p>
+            ) : (
+              <div className="board-select">
+                {boards.map((b, i) => (
+                  <label key={b.name} className="board">
+                    <input
+                      type="checkbox"
+                      checked={selected[i]}
+                      disabled={!b.connected}
+                      onChange={() => setSelected(selected.map((v, j) => (j === i ? !v : v)))}
+                    />
+                    <div><b>{b.name}</b><br /><small>{b.note}</small></div>
+                  </label>
+                ))}
+              </div>
+            )}
             <div className="form-grid" style={{ marginTop: 18 }}>
               <div className="field"><label>Publicatiemoment</label><select><option>Nu publiceren</option><option>Inplannen</option></select></div>
               <div className="field"><label>Sollicitaties ontvangen via</label><select><option>The Move Maker formulier</option><option>Extern jobboard</option></select></div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 9, marginTop: 20 }}>
               <button className="btn ghost" onClick={() => setPublishOpen(false)}>Annuleren</button>
-              <button className="btn primary" onClick={publish} disabled={!selectedCount || publishing}>{publishing ? 'Bezig…' : `Publiceer op ${selectedCount} kanalen`}</button>
+              <button className="btn primary" onClick={publish} disabled={loadingChannels || publishing}>
+                {publishing ? 'Bezig…' : selectedCount ? `Publiceer op ${selectedCount} kanalen` : 'Overal intrekken'}
+              </button>
             </div>
           </div>
         </div>

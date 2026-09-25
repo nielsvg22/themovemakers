@@ -1,4 +1,5 @@
 import 'server-only'
+import type { JobBoardChannel } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
 import { siteUrl } from '@/lib/email/templates'
 export { jobFeedUrl } from './feed-url'
@@ -26,12 +27,21 @@ const workModeMap: Record<string, string> = {
  * De naam van de opdrachtgever gaat hier bewust nooit mee: extern gepubliceerde feeds
  * tonen altijd "The Move Maker" als werkgever, ongeacht welk bedrijf intern aan de
  * vacature is gekoppeld.
+ *
+ * Met een `channel` toont de feed alleen vacatures die voor dát specifieke board actief
+ * zijn gepubliceerd (via de "Publiceer"-modal); zonder `channel` alle actieve vacatures
+ * (algemene/testfeed).
  */
-export async function buildJobFeedXml() {
+export async function buildJobFeedXml(channel?: JobBoardChannel) {
   const baseUrl = siteUrl()
 
   const vacancies = await prisma.vacancy.findMany({
-    where: { status: 'ACTIEF', publishedAt: { not: null }, expiresAt: { gte: new Date() } },
+    where: {
+      status: 'ACTIEF',
+      publishedAt: { not: null },
+      expiresAt: { gte: new Date() },
+      ...(channel ? { publications: { some: { channel, status: 'LIVE' } } } : {}),
+    },
     include: { sector: true },
     orderBy: { publishedAt: 'desc' },
     take: 1000,

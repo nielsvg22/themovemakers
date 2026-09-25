@@ -187,11 +187,21 @@ export async function setVacancyStatus(id: string, status: VacancyStatus) {
   refresh()
 }
 
+/**
+ * Brengt de publicatie in lijn met de aangevinkte kanalen uit de "Publiceer"-modal:
+ * publiceert wat ontbreekt, trekt in wat is uitgevinkt.
+ */
 export async function publishToChannels(vacancyId: string, channels: JobBoardChannel[]) {
   await requireStaffSession()
-  const results = await PublicationService.publishVacancy(vacancyId, channels, 'TEST')
+  const results = await PublicationService.syncChannels(vacancyId, channels, 'TEST')
   refresh()
-  return results.map((r) => ({ channel: r.channel, success: r.success, error: r.error }))
+  return results.map((r) => ({ channel: r.channel, success: r.success, error: 'error' in r ? r.error : undefined }))
+}
+
+/** Kanalen waarop deze vacature op dit moment actief is gepubliceerd, voor de "Publiceer"-modal. */
+export async function getVacancyChannels(vacancyId: string) {
+  await requireStaffSession()
+  return PublicationService.getActiveChannels(vacancyId)
 }
 
 const emailSettingsSchema = z.object({
