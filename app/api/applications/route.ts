@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { requireStaff } from '@/lib/auth/require-staff'
+import { ApplicationStatus, Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 const applicationSchema = z.object({
@@ -92,22 +94,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, applicationId: application.id })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validatiefout', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Validatiefout', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Solliciteren mislukt' }, { status: 500 })
   }
 }
 
 export async function GET(request: NextRequest) {
+  const denied = await requireStaff()
+  if (denied) return denied
+
   const { searchParams } = new URL(request.url)
   const vacancyId = searchParams.get('vacancyId')
   const status = searchParams.get('status')
   const page = parseInt(searchParams.get('page') || '1')
   const limit = parseInt(searchParams.get('limit') || '20')
 
-  const where: any = {}
+  if (status && !Object.values(ApplicationStatus).includes(status as ApplicationStatus)) {
+    return NextResponse.json({ error: 'Ongeldige status' }, { status: 400 })
+  }
+
+  const where: Prisma.ApplicationWhereInput = {}
   if (vacancyId) where.vacancyId = vacancyId
-  if (status) where.status = status
+  if (status) where.status = status as ApplicationStatus
 
   const [applications, total] = await Promise.all([
     prisma.application.findMany({

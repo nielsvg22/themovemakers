@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -36,6 +38,7 @@ export async function GET() {
         name: 'The Move Maker',
         value: vacancy.id,
       },
+      url: `${baseUrl}/vacatures/${vacancy.slug}`,
       datePosted: vacancy.publishedAt?.toISOString().split('T')[0],
       validThrough: vacancy.expiresAt?.toISOString().split('T')[0] || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       employmentType: contractTypeMap[vacancy.contractType] || 'FULL_TIME',

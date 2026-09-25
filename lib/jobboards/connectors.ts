@@ -1,4 +1,4 @@
-import { JobBoardChannel, VacancyWithRelations, VacancyPublication, JobBoardValidationResult, JobBoardDryRunResult, JobBoardPublicationResult, JobBoardPublicationStatus } from '@/types'
+import { JobBoardChannel, VacancyWithRelations, VacancyPublication, JobBoardPublicationResult, JobBoardPublicationStatus } from '@/types'
 import { BaseJobBoardConnector, JobBoardConnectorRegistry } from './base-connector'
 
 export class EigenWebsiteConnector extends BaseJobBoardConnector {
@@ -31,7 +31,7 @@ export class EigenWebsiteConnector extends BaseJobBoardConnector {
     }
   }
 
-  async publish(vacancy: VacancyWithRelations, publication: VacancyPublication): Promise<JobBoardPublicationResult> {
+  async publish(vacancy: VacancyWithRelations, _publication: VacancyPublication): Promise<JobBoardPublicationResult> {
     return {
       success: true,
       externalJobId: `TMM-${vacancy.id.slice(0, 8)}`,
@@ -45,12 +45,12 @@ export class EigenWebsiteConnector extends BaseJobBoardConnector {
     return this.publish(vacancy, publication)
   }
 
-  async close(publication: VacancyPublication): Promise<void> {
+  async close(_publication: VacancyPublication): Promise<void> {
     // No-op for own website - handled by vacancy status
   }
 
   async status(publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
-    return { status: 'LIVE', externalJobId: publication.externalJobId }
+    return { status: 'LIVE', externalJobId: publication.externalJobId ?? undefined }
   }
 }
 
@@ -116,7 +116,7 @@ export class GoogleForJobsConnector extends BaseJobBoardConnector {
     return map[type] || 'FULL_TIME'
   }
 
-  async publish(vacancy: VacancyWithRelations, publication: VacancyPublication): Promise<JobBoardPublicationResult> {
+  async publish(vacancy: VacancyWithRelations, _publication: VacancyPublication): Promise<JobBoardPublicationResult> {
     return {
       success: true,
       externalJobId: `GOOGLE-${vacancy.id}`,
@@ -129,12 +129,12 @@ export class GoogleForJobsConnector extends BaseJobBoardConnector {
     return this.publish(vacancy, publication)
   }
 
-  async close(publication: VacancyPublication): Promise<void> {
+  async close(_publication: VacancyPublication): Promise<void> {
     // Handled by removing structured data
   }
 
   async status(publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
-    return { status: 'ELIGIBLE', externalJobId: publication.externalJobId }
+    return { status: 'ELIGIBLE', externalJobId: publication.externalJobId ?? undefined }
   }
 }
 
@@ -187,15 +187,15 @@ export class LinkedInConnector extends BaseJobBoardConnector {
     return this.publish(vacancy, publication)
   }
 
-  async close(publication: VacancyPublication): Promise<void> {
+  async close(_publication: VacancyPublication): Promise<void> {
     // Would call LinkedIn API to close job
   }
 
   async status(publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
     if (publication.mode === 'TEST') {
-      return { status: 'GETEST', externalJobId: publication.externalJobId }
+      return { status: 'GETEST', externalJobId: publication.externalJobId ?? undefined }
     }
-    return { status: publication.status, externalJobId: publication.externalJobId }
+    return { status: publication.status, externalJobId: publication.externalJobId ?? undefined }
   }
 }
 
@@ -243,19 +243,19 @@ export class IndeedConnector extends BaseJobBoardConnector {
     return this.publish(vacancy, publication)
   }
 
-  async close(publication: VacancyPublication): Promise<void> {
+  async close(_publication: VacancyPublication): Promise<void> {
     // Would call Indeed API to close job
   }
 
   async status(publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
     if (publication.mode === 'TEST') {
-      return { status: 'GETEST', externalJobId: publication.externalJobId }
+      return { status: 'GETEST', externalJobId: publication.externalJobId ?? undefined }
     }
-    return { status: publication.status, externalJobId: publication.externalJobId }
+    return { status: publication.status, externalJobId: publication.externalJobId ?? undefined }
   }
 }
 
-export class DisconnectedConnector extends BaseJobBoardConnector {
+export abstract class DisconnectedConnector extends BaseJobBoardConnector {
   abstract key: JobBoardChannel
   abstract name: string
   abstract logo: string
@@ -274,7 +274,7 @@ export class DisconnectedConnector extends BaseJobBoardConnector {
     }
   }
 
-  async publish(vacancy: VacancyWithRelations, publication: VacancyPublication): Promise<JobBoardPublicationResult> {
+  async publish(_vacancy: VacancyWithRelations, _publication: VacancyPublication): Promise<JobBoardPublicationResult> {
     return {
       success: false,
       errors: [`${this.name} is niet gekoppeld. Configureer eerst de API koppeling in Instellingen.`],
@@ -286,9 +286,9 @@ export class DisconnectedConnector extends BaseJobBoardConnector {
     return this.publish(vacancy, publication)
   }
 
-  async close(publication: VacancyPublication): Promise<void> {}
+  async close(_publication: VacancyPublication): Promise<void> {}
 
-  async status(publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
+  async status(_publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
     return { status: 'NIET_GEKOPPELD', errorMessage: `${this.name} is niet gekoppeld` }
   }
 }

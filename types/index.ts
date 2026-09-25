@@ -1,6 +1,7 @@
-import { VacancyStatus, ContractType, WorkMode, ApplicationStatus, PublicationStatus, PublicationMode, JobBoardChannel, LeadType, TaskPriority, TaskStatus, AppointmentType, UserRole } from '@prisma/client'
+import type { VacancyPublication, VacancyStatus, ContractType, WorkMode, ApplicationStatus, PublicationStatus, PublicationMode, JobBoardChannel, LeadType, TaskPriority, TaskStatus, AppointmentType, UserRole } from '@prisma/client'
 
 export type {
+  VacancyPublication,
   VacancyStatus,
   ContractType,
   WorkMode,
@@ -23,6 +24,7 @@ export interface VacancyWithRelations {
     id: string
     name: string
     logo: string | null
+    website?: string | null
   }
   sector: {
     id: string
@@ -57,7 +59,7 @@ export interface VacancyWithRelations {
   applicationProcess: string | null
   metaTitle: string | null
   metaDescription: string | null
-  _count: {
+  _count?: {
     applications: number
     publications: number
   }

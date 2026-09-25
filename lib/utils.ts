@@ -51,13 +51,13 @@ export function truncate(text: string, length: number): string {
   return text.slice(0, length).trim() + '...'
 }
 
+/** Voorletter van de voornaam en de achternaam: "Sophie de Vries" → "SV". */
 export function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return ''
+  const first = parts[0][0]
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : ''
+  return (first + last).toUpperCase()
 }
 
 export function getStatusColor(status: string): string {
@@ -78,7 +78,7 @@ export function getStatusColor(status: string): string {
     AFGEWEZEN: 'bg-red-100 text-red-700',
     LIVE: 'bg-green-100 text-green-700',
     IN_WACHTRIJ: 'bg-yellow-100 text-yellow-700',
-    FOUD: 'bg-red-100 text-red-700',
+    FOUT: 'bg-red-100 text-red-700',
     GETEST: 'bg-gray-100 text-gray-700',
     NIEUWE: 'bg-blue-100 text-blue-700',
   }

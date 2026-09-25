@@ -20,6 +20,8 @@ jest.mock('@/lib/db/prisma', () => ({
   },
 }))
 
+jest.mock('@/lib/jobboards/connectors', () => ({}))
+
 jest.mock('@/lib/jobboards/base-connector', () => ({
   JobBoardConnectorRegistry: {
     get: jest.fn(),

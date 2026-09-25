@@ -130,7 +130,7 @@ npm run dev
 De app draait nu op `http://localhost:3000`
 
 ### Admin inloggen (development)
-- **URL**: `http://localhost:3000/admin/login`
+- **URL**: `http://localhost:3000/login` (alle `/admin`-pagina's sturen hierheen door zolang je niet bent ingelogd)
 - **Email**: `niels@themovemaker.nl`
 - **Wachtwoord**: `admin123`
 
@@ -211,8 +211,18 @@ Kleuren (uit de design referenties):
 - **Line**: `#e5eaed` (borders)
 - **Soft**: `#f5f7f8` (achtergronden)
 
-Componenten in `components/ui/`:
-Button, Input, Select, Textarea, Badge, Card, Modal, Drawer, Tabs, Table, Toast, Dropdown, Search, EmptyState, LoadingState, Pagination
+De designs staan in de repo als bron van waarheid:
+- `The-Move-Maker-feedback-design.html` → publieke website, CSS in `styles/site.css` (gescoped onder `.tmm-site`)
+- `The-Move-Maker-admin-ATS-design.html` → admin/ATS, CSS in `styles/ats.css` (gescoped onder `.tmm-ats`)
+
+Pas bij designwijzigingen eerst deze CSS aan; de componenten gebruiken de klassenamen uit de designs.
+Tailwind (v4, zonder preflight) is alleen nog nodig voor de losse componenten in `components/ui/`.
+
+## 🗄 Prisma 7
+
+- De database-URL staat in `prisma.config.ts` (leest `DATABASE_URL`), niet meer in `schema.prisma`.
+- De client verbindt via `@prisma/adapter-pg` (zie `lib/db/prisma.ts`).
+- Seeden gaat via `tsx`: `npm run db:seed`.
 
 ## 📄 Licentie
 

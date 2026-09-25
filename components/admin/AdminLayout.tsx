@@ -56,7 +56,6 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     timer.current = setTimeout(() => setToastVisible(false), 2400)
   }, [])
 
-  useEffect(() => setSidebarOpen(false), [pathname])
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const isActive = (href: string) => (href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`))
@@ -72,10 +71,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       <div className="tmm-ats">
         <div className="app">
           <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
-            <Link href="/admin" className="logo">THE<br />MOVE <span className="lime">/</span><br />MAKER</Link>
+            <Link href="/admin" className="logo" onClick={() => setSidebarOpen(false)}>THE<br />MOVE <span className="lime">/</span><br />MAKER</Link>
             <nav className="nav" aria-label="Admin menu">
               {navigation.map((item) => (
-                <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : undefined} aria-current={isActive(item.href) ? 'page' : undefined}>
+                <Link key={item.href} href={item.href} className={isActive(item.href) ? 'active' : undefined} aria-current={isActive(item.href) ? 'page' : undefined} onClick={() => setSidebarOpen(false)}>
                   <span className="dot" />{item.name}
                 </Link>
               ))}

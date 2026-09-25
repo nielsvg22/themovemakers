@@ -42,11 +42,20 @@ describe('Utility functions', () => {
 
   describe('truncate', () => {
     it('truncates long text', () => {
-      expect(truncate('Dit is een heel lange tekst die getruncated moet worden', 20)).toBe('Dit is een heel lan...')
+      expect(truncate('Dit is een heel lange tekst die getruncated moet worden', 20)).toBe('Dit is een heel lang...')
     })
 
     it('returns original if shorter', () => {
       expect(truncate('Korte tekst', 20)).toBe('Korte tekst')
+    })
+  })
+
+  describe('formatRelativeTime', () => {
+    it('formats recent dates relative to now', () => {
+      expect(formatRelativeTime(new Date())).toBe('Zojuist')
+      expect(formatRelativeTime(new Date(Date.now() - 5 * 60000))).toBe('5 min geleden')
+      expect(formatRelativeTime(new Date(Date.now() - 3 * 3600000))).toBe('3 uur geleden')
+      expect(formatRelativeTime(new Date(Date.now() - 2 * 86400000))).toBe('2 dagen geleden')
     })
   })
 
