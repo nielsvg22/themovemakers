@@ -60,18 +60,21 @@ export function JobFeedPanel({ feedUrl }: Props) {
       </div>
       {result && <p style={{ margin: '0 0 12px', fontSize: 13, color: result.ok ? 'var(--green)' : 'var(--red)' }}>{result.message}</p>}
       <div className="grid connector-grid">
-        {feedBoards.map((b) => (
-          <div key={b.key} className="card connector">
-            <div className="connector-head">
-              <div><h3>{b.name}</h3><p>{b.how}</p></div>
-              <span className="badge b-blue">Via feed</span>
+        {feedBoards.map((b) => {
+          const recommended = 'recommended' in b && b.recommended
+          return (
+            <div key={b.key} className="card connector" style={recommended ? { borderColor: 'var(--lime)', borderWidth: 2 } : undefined}>
+              <div className="connector-head">
+                <div><h3>{b.name}</h3><p>{b.how}</p></div>
+                <span className={`badge ${recommended ? 'b-green' : 'b-blue'}`}>{recommended ? 'Aanbevolen om te testen' : 'Via feed'}</span>
+              </div>
+              {'note' in b && b.note && <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--muted)' }}>{recommended ? '✓' : '⚠'} {b.note}</p>}
+              {'href' in b && b.href && (
+                <a className="btn ghost" href={b.href} target="_blank" rel="noopener noreferrer">Aanmeldpagina openen</a>
+              )}
             </div>
-            {'note' in b && b.note && <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--muted)' }}>⚠ {b.note}</p>}
-            {'href' in b && b.href && (
-              <a className="btn ghost" href={b.href} target="_blank" rel="noopener noreferrer">Aanmeldpagina openen</a>
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
