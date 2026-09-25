@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PublicLayout } from '@/components/public/PublicLayout'
 import { getPublicJob } from '@/lib/data/vacancies'
+import { getSiteImages } from '@/lib/data/site-images'
 import { JobDetailPage } from './_components/JobDetailPage'
 
 export const dynamic = 'force-dynamic'
@@ -22,9 +23,10 @@ export async function generateMetadata({ params }: JobDetailRouteProps): Promise
 export default async function JobDetailRoute({ params }: JobDetailRouteProps) {
   const job = await getPublicJob((await params).slug)
   if (!job) notFound()
+  const { images } = await getSiteImages()
   return (
     <PublicLayout>
-      <JobDetailPage job={job} />
+      <JobDetailPage job={job} fallbackImage={images.jobDetail} />
     </PublicLayout>
   )
 }

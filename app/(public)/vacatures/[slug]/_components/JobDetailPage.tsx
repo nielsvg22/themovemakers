@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteUI } from '@/components/public/SiteUI'
-import { images, sectorHref, type Job } from '@/lib/data/site'
+import { sectorHref, images as defaultImages, type Job } from '@/lib/data/site'
 
 export interface JobDetail extends Job {
   description: string
@@ -13,7 +13,7 @@ export interface JobDetail extends Job {
   companyInfo: string | null
 }
 
-export function JobDetailPage({ job }: { job: JobDetail }) {
+export function JobDetailPage({ job, fallbackImage = defaultImages.jobDetail }: { job: JobDetail; fallbackImage?: string }) {
   const { openModal } = useSiteUI()
   const [activeTab, setActiveTab] = useState('over')
 
@@ -64,7 +64,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               ))}
             </div>
             <div className="detail-content">
-              <img className="detail-image" src={job.img || images.jobDetail} alt="" />
+              <img className="detail-image" src={job.img || fallbackImage} alt="" />
               <h3 id="tab-over">Over de functie</h3>
               <p>{job.description}</p>
               {job.responsibilities.length > 0 && (

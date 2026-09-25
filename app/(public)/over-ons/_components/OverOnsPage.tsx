@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PageHero } from '@/components/public/PageHero'
 import { ServicesGrid } from '@/app/(public)/_components/ServicesGrid'
-import { images } from '@/lib/data/site'
+import { getSiteImages } from '@/lib/data/site-images'
 
 const values = [
   { icon: '◉', title: 'Specialisme', text: 'We kennen de bouw, civiel en techniek sector door en door.' },
@@ -10,7 +10,8 @@ const values = [
   { icon: '✓', title: 'Duurzaam', text: 'We zoeken matches die langdurig werken, niet alleen voor nu.' },
 ]
 
-export function OverOnsPage() {
+export async function OverOnsPage() {
+  const { images } = await getSiteImages()
   return (
     <>
       <PageHero

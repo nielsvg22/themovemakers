@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { images } from '@/lib/data/site'
+import { getSiteImages } from '@/lib/data/site-images'
 
 const benefits = [
   { icon: '✓', text: 'Persoonlijk contact' },
@@ -8,7 +8,8 @@ const benefits = [
   { icon: '◎', text: 'Ook recruitment marketing' },
 ]
 
-export function Hero() {
+export async function Hero() {
+  const { images } = await getSiteImages()
   return (
     <div className="hero">
       <img className="hero-bg" src={images.hero} alt="Bouwplaats" />

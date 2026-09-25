@@ -1,10 +1,4 @@
-import { caseImages } from '@/lib/data/site'
-
-const cases = [
-  { title: 'Uitvoerder Bouw', img: caseImages.bouw, stats: ['4', '18', '1'] },
-  { title: 'Werkvoorbereider Civiel', img: caseImages.civiel, stats: ['6', '14', '1'] },
-  { title: 'Projectleider Techniek', img: caseImages.techniek, stats: ['5', '21', '1'] },
-]
+import { getSiteImages } from '@/lib/data/site-images'
 
 interface CaseStudiesProps {
   title?: string
@@ -12,10 +6,16 @@ interface CaseStudiesProps {
   labels?: [string, string, string]
 }
 
-export function CaseStudies({
+export async function CaseStudies({
   title = 'Resultaten waar we trots op zijn',
   labels = ['geschikte kandidaten', 'dagen tot gesprek', 'plaatsing'],
 }: CaseStudiesProps) {
+  const { caseImages } = await getSiteImages()
+  const cases = [
+    { title: 'Uitvoerder Bouw', img: caseImages.bouw, stats: ['4', '18', '1'] },
+    { title: 'Werkvoorbereider Civiel', img: caseImages.civiel, stats: ['6', '14', '1'] },
+    { title: 'Projectleider Techniek', img: caseImages.techniek, stats: ['5', '21', '1'] },
+  ]
   return (
     <section style={{ background: '#f7f8f8' }}>
       <div className="container">

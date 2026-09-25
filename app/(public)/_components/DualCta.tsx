@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { images } from '@/lib/data/site'
+import { getSiteImages } from '@/lib/data/site-images'
 
-const ctas = [
-  { title: 'Ik zoek baan', text: 'Vind de vacature die bij jou past en maak de volgende stap in je carrière.', href: '/vacatures', label: 'Bekijk alle vacatures →', img: images.ctaJob },
-  { title: 'Ik zoek personeel', text: 'Wij vinden, selecteren en overtuigen de juiste mensen voor jouw organisatie.', href: '/voor-werkgevers', label: 'Bekijk onze diensten →', img: images.ctaStaff },
-]
-
-export function DualCta() {
+export async function DualCta() {
+  const { images } = await getSiteImages()
+  const ctas = [
+    { title: 'Ik zoek baan', text: 'Vind de vacature die bij jou past en maak de volgende stap in je carrière.', href: '/vacatures', label: 'Bekijk alle vacatures →', img: images.ctaJob },
+    { title: 'Ik zoek personeel', text: 'Wij vinden, selecteren en overtuigen de juiste mensen voor jouw organisatie.', href: '/voor-werkgevers', label: 'Bekijk onze diensten →', img: images.ctaStaff },
+  ]
   return (
     <div className="dual-cta">
       {ctas.map((cta) => (
