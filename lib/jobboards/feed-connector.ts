@@ -26,9 +26,10 @@ export class FeedJobBoardConnector extends BaseJobBoardConnector {
   }
 
   protected buildPayload(vacancy: VacancyWithRelations): Record<string, unknown> {
+    // De echte opdrachtgever gaat nooit mee naar externe boards; de feed toont altijd The Move Maker.
     return {
       title: vacancy.title,
-      company: vacancy.company?.name ?? 'The Move Maker',
+      company: 'The Move Maker',
       location: vacancy.location,
       description: vacancy.description,
       feedUrl: jobFeedUrl(),
