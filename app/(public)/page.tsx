@@ -5,7 +5,6 @@ import { getSectorCounts } from '@/lib/data/vacancies'
 import { Hero } from './_components/Hero'
 import { SectorGrid } from './_components/SectorGrid'
 import { DualCta } from './_components/DualCta'
-import { PartnerLogos } from './_components/PartnerLogos'
 import { EmployerHero } from './_components/EmployerHero'
 import { ServicesGrid } from './_components/ServicesGrid'
 import { ApproachSteps } from './_components/ApproachSteps'
@@ -29,7 +28,6 @@ export default async function HomePage() {
         <div className="container">
           <SectorGrid counts={counts} />
           <DualCta />
-          <PartnerLogos />
         </div>
       </section>
 
