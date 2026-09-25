@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma'
 import { ConnectorsGrid } from '@/components/admin/ConnectorsGrid'
 import { JobFeedPanel } from '@/components/admin/JobFeedPanel'
 import { jobFeedUrl } from '@/lib/jobboards/feed'
+import { feedBoards } from '@/lib/admin/feed-boards'
 import { dateTimeLabel } from '@/lib/admin/labels'
 import { getChannelLabel } from '@/lib/utils'
 
@@ -13,6 +14,8 @@ const statusText: Record<string, string> = { LIVE: 'Live', ELIGIBLE: 'Eligible',
 
 export default async function PublicatiesPage() {
   const publications = await prisma.vacancyPublication.findMany({ include: { vacancy: true }, orderBy: { createdAt: 'desc' }, take: 30 })
+  // Server-berekende URL's per board: een functie kan niet als prop naar een Client Component.
+  const boardFeedUrls = Object.fromEntries(feedBoards.map((b) => [b.key, jobFeedUrl(b.key)]))
   return (
     <>
       <div className="page-head">
@@ -20,7 +23,7 @@ export default async function PublicatiesPage() {
         <Link className="btn primary" href="/admin/vacatures">Nieuwe publicatie</Link>
       </div>
       <ConnectorsGrid />
-      <JobFeedPanel feedUrl={jobFeedUrl()} boardFeedUrl={jobFeedUrl} />
+      <JobFeedPanel feedUrl={jobFeedUrl()} boardFeedUrls={boardFeedUrls} />
       <div className="card panel" style={{ marginTop: 16, overflowX: 'auto' }}>
         <h3>Recente publicaties</h3>
         <table className="table">

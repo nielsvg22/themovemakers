@@ -7,7 +7,8 @@ import { useAdminUI } from './AdminUI'
 
 interface Props {
   feedUrl: string
-  boardFeedUrl: (channel: string) => string
+  /** Kant-en-klare feed-URL per kanaal, al op de server berekend (functies kunnen niet als prop naar een Client Component). */
+  boardFeedUrls: Record<string, string>
 }
 
 /**
@@ -17,7 +18,7 @@ interface Props {
  * bepaalt het vinkje bij dat board in de "Publiceer"-modal ook echt of een vacature
  * bij dát specifieke board verschijnt of verdwijnt.
  */
-export function JobFeedPanel({ feedUrl, boardFeedUrl }: Props) {
+export function JobFeedPanel({ feedUrl, boardFeedUrls }: Props) {
   const { toast } = useAdminUI()
   const [result, setResult] = useState<FeedTestResult | null>(null)
   const [testing, start] = useTransition()
@@ -71,7 +72,7 @@ export function JobFeedPanel({ feedUrl, boardFeedUrl }: Props) {
       <div className="grid connector-grid">
         {feedBoards.map((b) => {
           const recommended = 'recommended' in b && b.recommended
-          const url = boardFeedUrl(b.key)
+          const url = boardFeedUrls[b.key] ?? feedUrl
           const r = boardResult[b.key]
           return (
             <div key={b.key} className="card connector" style={recommended ? { borderColor: 'var(--lime)', borderWidth: 2 } : undefined}>
