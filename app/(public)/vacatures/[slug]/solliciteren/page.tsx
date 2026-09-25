@@ -33,7 +33,7 @@ export default async function SolliciterenPage({ params }: Props) {
         breadcrumbs={<><Link href="/">Home</Link> / <Link href="/vacatures">Vacatures</Link> / <Link href={`/vacatures/${job.slug}`}>{job.title}</Link> / Solliciteren</>}
         title={`Solliciteren als ${job.title}`}
         titleSize={44}
-        subtitle={`${job.company} · ${job.city}. Vul je gegevens in en upload je cv; het kost ongeveer twee minuten.`}
+        subtitle={`${[job.company, job.city].filter(Boolean).join(' · ')}. Vul je gegevens in en upload je cv; het kost ongeveer twee minuten.`}
       />
       <div className="forms-zone">
         <div className="container forms-grid apply-grid">
@@ -44,7 +44,7 @@ export default async function SolliciterenPage({ params }: Props) {
           </div>
           <div className="form-card" style={{ alignSelf: 'start' }}>
             <h3>{job.title}</h3>
-            <p className="sub">{job.company}</p>
+            {job.company && <p className="sub">{job.company}</p>}
             <div className="popular-row"><span>Locatie</span><b>{job.city}</b></div>
             <div className="popular-row"><span>Salaris</span><b>{job.salary}</b></div>
             <div className="popular-row"><span>Uren</span><b>{job.hours}</b></div>

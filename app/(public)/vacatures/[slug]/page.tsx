@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: JobDetailRouteProps): Promise
   if (!job) return { title: 'Vacature niet gevonden' }
   return {
     title: `${job.title} | Vacature`,
-    description: `${job.title} bij ${job.company} in ${job.city}. ${job.description.slice(0, 140)}`,
+    description: `${job.title}${job.company ? ` bij ${job.company}` : ''} in ${job.city}. ${job.description.slice(0, 140)}`,
   }
 }
 

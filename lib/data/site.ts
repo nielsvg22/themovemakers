@@ -4,7 +4,8 @@ export interface Job {
   id?: string
   slug: string
   title: string
-  company: string
+  /** Leeg bij een vacature zonder (genoemde) opdrachtgever. */
+  company: string | null
   city: string
   salary: string
   hours: string

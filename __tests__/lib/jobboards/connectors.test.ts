@@ -1,4 +1,5 @@
-import { EigenWebsiteConnector, GoogleForJobsConnector, LinkedInConnector, IndeedConnector, NationaleVacaturebankConnector } from '@/lib/jobboards/connectors'
+import { EigenWebsiteConnector, GoogleForJobsConnector, LinkedInConnector, IndeedConnector } from '@/lib/jobboards/connectors'
+import { FeedJobBoardConnector } from '@/lib/jobboards/feed-connector'
 import { JobBoardConnectorRegistry } from '@/lib/jobboards/base-connector'
 import { JobBoardChannel, VacancyStatus, ContractType, WorkMode, type VacancyPublication } from '@prisma/client'
 
@@ -134,19 +135,19 @@ describe('JobBoard Connectors', () => {
     })
   })
 
-  describe('DisconnectedConnector (Nationale Vacaturebank)', () => {
-    const connector = new NationaleVacaturebankConnector()
+  describe('FeedJobBoardConnector (Nationale Vacaturebank)', () => {
+    const connector = new FeedJobBoardConnector(JobBoardChannel.NATIONALE_VACATUREBANK, 'Nationale Vacaturebank', 'N')
 
     it('has correct key and name', () => {
       expect(connector.key).toBe(JobBoardChannel.NATIONALE_VACATUREBANK)
       expect(connector.name).toBe('Nationale Vacaturebank')
     })
 
-    it('always fails publish when not connected', async () => {
+    it('publishes successfully via the shared jobfeed', async () => {
       const publication = { id: 'pub-1', vacancyId: 'test-vacancy-1', channel: JobBoardChannel.NATIONALE_VACATUREBANK, mode: 'TEST', status: 'CONCEPT' }
       const result = await connector.publish(mockVacancy, publication as unknown as VacancyPublication)
-      expect(result.success).toBe(false)
-      expect(result.errors[0]).toContain('niet gekoppeld')
+      expect(result.success).toBe(true)
+      expect(result.url).toContain('/api/jobfeeds/vacatures.xml')
     })
   })
 })
@@ -154,6 +155,7 @@ describe('JobBoardConnectorRegistry', () => {
   it('registers all connectors when the connectors module is loaded', () => {
     expect(JobBoardConnectorRegistry.get(JobBoardChannel.EIGEN_WEBSITE)).toBeInstanceOf(EigenWebsiteConnector)
     expect(JobBoardConnectorRegistry.get(JobBoardChannel.LINKEDIN)).toBeInstanceOf(LinkedInConnector)
-    expect(JobBoardConnectorRegistry.getAll()).toHaveLength(9)
+    expect(JobBoardConnectorRegistry.get(JobBoardChannel.NATIONALE_VACATUREBANK)).toBeInstanceOf(FeedJobBoardConnector)
+    expect(JobBoardConnectorRegistry.getAll()).toHaveLength(15)
   })
 })

@@ -155,6 +155,14 @@
   & .login-card { width: min(420px, 100%); padding: 28px }
   /* afwijking: overlay achter de mobiele sidebar */
   & .sidebar-backdrop { display: none }
+  /* afwijking: tellers en uitlogknop (niet in het design) */
+  & .top-icon { position: relative; text-decoration: none }
+  & .top-badge { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--red); color: #fff; font-size: 11px; line-height: 18px; font-weight: 800 }
+  & .nav-count { margin-left: auto; background: rgba(255, 255, 255, .14); border-radius: 9px; padding: 1px 7px; font-size: 11px; font-weight: 800 }
+  & .nav a.active .nav-count, & .nav a:hover .nav-count { background: rgba(11, 34, 53, .12) }
+  & .user b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+  & .logout { background: transparent; border: 1px solid rgba(255, 255, 255, .2); color: #c9d3dd; border-radius: 8px; width: 30px; height: 30px; flex: none }
+  & .logout:hover { background: var(--lime); color: var(--navy) }
   /* afwijking: toast i.p.v. alert() */
   & .ats-toast { position: fixed; right: 20px; bottom: 20px; background: var(--navy); color: #fff; padding: 14px 18px; border-radius: 12px; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0; pointer-events: none; transition: .25s; z-index: 40; font-size: 14px; font-weight: 700 }
   & .ats-toast.show { transform: none; opacity: 1 }

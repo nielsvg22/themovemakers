@@ -88,6 +88,7 @@ enum JobBoardChannel {
   JOBSONLINE
   TWENTY4WERK
   NUBANEN
+  JOOF
 }
 
 enum LeadType {
@@ -222,8 +223,8 @@ model Vacancy {
   id                 String               @id @default(cuid())
   title              String
   slug               String               @unique
-  companyId          String
-  company            Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId          String?
+  company            Company?             @relation(fields: [companyId], references: [id], onDelete: SetNull)
   sectorId           String
   sector             Sector               @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   recruiterId        String?

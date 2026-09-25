@@ -56,7 +56,7 @@ export abstract class BaseJobBoardConnector implements JobBoardConnector {
   protected getFieldValue(vacancy: VacancyWithRelations, field: string): unknown {
     const fieldMap: Record<string, unknown> = {
       title: vacancy.title,
-      company: vacancy.company.name,
+      company: vacancy.company?.name ?? 'The Move Maker',
       location: vacancy.location,
       description: vacancy.description,
       salaryMin: vacancy.salaryMin,

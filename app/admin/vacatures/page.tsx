@@ -15,7 +15,7 @@ export default async function AdminVacaturesPage({ searchParams }: { searchParam
     id: v.id,
     slug: v.slug,
     title: v.title,
-    company: v.company.name,
+    company: v.company?.name ?? null,
     sector: v.sector.name,
     city: v.city ?? v.location,
     salary: salaryLabel(v.salaryMin, v.salaryMax),

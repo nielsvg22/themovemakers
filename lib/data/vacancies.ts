@@ -36,7 +36,7 @@ export function toJob(v: VacancyRow): Job {
     id: v.id,
     slug: v.slug,
     title: v.title,
-    company: v.company.name,
+    company: v.company?.name ?? null,
     city: v.city ?? v.location,
     salary: salaryLabel(v.salaryMin, v.salaryMax),
     hours: hoursLabel(v.hoursMin, v.hoursMax),
@@ -72,7 +72,7 @@ export async function getPublicJob(slug: string) {
     responsibilities: lines(v.responsibilities),
     requirements: lines(v.requirements),
     benefits: v.benefits,
-    companyInfo: v.companyInfo || v.company.description,
+    companyInfo: v.companyInfo || v.company?.description || null,
   }
 }
 

@@ -44,8 +44,8 @@ export async function GET() {
       employmentType: contractTypeMap[vacancy.contractType] || 'FULL_TIME',
       hiringOrganization: {
         '@type': 'Organization',
-        name: vacancy.company.name,
-        sameAs: vacancy.company.website || undefined,
+        name: vacancy.company?.name ?? 'The Move Maker',
+        sameAs: vacancy.company?.website || undefined,
       },
       jobLocation: {
         '@type': 'Place',

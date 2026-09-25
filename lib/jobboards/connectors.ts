@@ -1,5 +1,6 @@
 import { JobBoardChannel, VacancyWithRelations, VacancyPublication, JobBoardPublicationResult, JobBoardPublicationStatus } from '@/types'
 import { BaseJobBoardConnector, JobBoardConnectorRegistry } from './base-connector'
+import { FeedJobBoardConnector } from './feed-connector'
 
 export class EigenWebsiteConnector extends BaseJobBoardConnector {
   key = 'EIGEN_WEBSITE' as JobBoardChannel
@@ -15,7 +16,7 @@ export class EigenWebsiteConnector extends BaseJobBoardConnector {
     return {
       title: vacancy.title,
       slug: vacancy.slug,
-      company: vacancy.company.name,
+      company: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       description: vacancy.description,
       responsibilities: vacancy.responsibilities,
@@ -80,8 +81,8 @@ export class GoogleForJobsConnector extends BaseJobBoardConnector {
       employmentType: this.mapContractType(vacancy.contractType),
       hiringOrganization: {
         '@type': 'Organization',
-        name: vacancy.company.name,
-        sameAs: vacancy.company.website || undefined,
+        name: (vacancy.company?.name ?? 'The Move Maker'),
+        sameAs: vacancy.company?.website || undefined,
       },
       jobLocation: {
         '@type': 'Place',
@@ -152,7 +153,7 @@ export class LinkedInConnector extends BaseJobBoardConnector {
     return {
       title: vacancy.title,
       description: vacancy.description,
-      companyName: vacancy.company.name,
+      companyName: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       salaryRange: {
         min: vacancy.salaryMin,
@@ -213,7 +214,7 @@ export class IndeedConnector extends BaseJobBoardConnector {
     return {
       jobkey: `indeed-${vacancy.id}`,
       title: vacancy.title,
-      company: vacancy.company.name,
+      company: (vacancy.company?.name ?? 'The Move Maker'),
       location: vacancy.location,
       description: vacancy.description,
       salary: vacancy.salaryMin && vacancy.salaryMax ? `${vacancy.salaryMin}-${vacancy.salaryMax}` : undefined,
@@ -255,89 +256,33 @@ export class IndeedConnector extends BaseJobBoardConnector {
   }
 }
 
-export abstract class DisconnectedConnector extends BaseJobBoardConnector {
-  abstract key: JobBoardChannel
-  abstract name: string
-  abstract logo: string
-  abstract description: string
-
-  protected getRequiredFields(): string[] {
-    return ['title', 'company', 'location', 'description']
-  }
-
-  protected buildPayload(vacancy: VacancyWithRelations): Record<string, unknown> {
-    return {
-      title: vacancy.title,
-      company: vacancy.company.name,
-      location: vacancy.location,
-      description: vacancy.description,
-    }
-  }
-
-  async publish(_vacancy: VacancyWithRelations, _publication: VacancyPublication): Promise<JobBoardPublicationResult> {
-    return {
-      success: false,
-      errors: [`${this.name} is niet gekoppeld. Configureer eerst de API koppeling in Instellingen.`],
-      rawResponse: { error: 'NOT_CONNECTED', connector: this.key },
-    }
-  }
-
-  async update(vacancy: VacancyWithRelations, publication: VacancyPublication): Promise<JobBoardPublicationResult> {
-    return this.publish(vacancy, publication)
-  }
-
-  async close(_publication: VacancyPublication): Promise<void> {}
-
-  async status(_publication: VacancyPublication): Promise<JobBoardPublicationStatus> {
-    return { status: 'NIET_GEKOPPELD', errorMessage: `${this.name} is niet gekoppeld` }
-  }
-}
-
-export class NationaleVacaturebankConnector extends DisconnectedConnector {
-  key = 'NATIONALE_VACATUREBANK' as JobBoardChannel
-  name = 'Nationale Vacaturebank'
-  logo = 'N'
-  description = 'API/feed configuratie nog nodig'
-}
-
-export class JobbirdConnector extends DisconnectedConnector {
-  key = 'JOBBIRD' as JobBoardChannel
-  name = 'Jobbird'
-  logo = 'J'
-  description = 'API/feed configuratie nog nodig'
-}
-
-export class MonsterboardConnector extends DisconnectedConnector {
-  key = 'MONSTERBOARD' as JobBoardChannel
-  name = 'Monsterboard'
-  logo = 'M'
-  description = 'API/feed configuratie nog nodig'
-}
-
-export class WerkzoekenConnector extends DisconnectedConnector {
-  key = 'WERKZOEKEN_NL' as JobBoardChannel
-  name = 'Werkzoeken.nl'
-  logo = 'W'
-  description = 'API/feed configuratie nog nodig'
-}
-
-export class JoobleConnector extends DisconnectedConnector {
-  key = 'JOOBLE' as JobBoardChannel
-  name = 'Jooble'
-  logo = 'J'
-  description = 'API/feed configuratie nog nodig'
-}
+/**
+ * Boards zonder publieke push-API voor losse werkgevers: ze halen vacatures zelf op uit
+ * onze gedeelde jobfeed zodra die eenmalig bij ze is aangemeld. Zie FeedJobBoardConnector
+ * en /admin/publicaties voor de feed-URL en aanmeldinstructies per board.
+ */
+const feedBoards: [JobBoardChannel, string, string][] = [
+  ['WERKZOEKEN_NL', 'Werkzoeken.nl', 'W'],
+  ['JOBBIRD', 'Jobbird', 'J'],
+  ['NATIONALE_VACATUREBANK', 'Nationale Vacaturebank', 'N'],
+  ['TOPVACATUREBANK', 'TopVacaturebank', 'T'],
+  ['JOBER', 'Jober', 'J'],
+  ['JOBSONLINE', 'Jobsonline', 'J'],
+  ['TWENTY4WERK', '24werk', '24'],
+  ['NUBANEN', 'NuBanen', 'N'],
+  ['JOOF', 'Joof', 'J'],
+  ['MONSTERBOARD', 'Monsterboard', 'M'],
+  ['JOOBLE', 'Jooble', 'J'],
+]
 
 export function registerAllConnectors() {
   JobBoardConnectorRegistry.register(new EigenWebsiteConnector())
   JobBoardConnectorRegistry.register(new GoogleForJobsConnector())
   JobBoardConnectorRegistry.register(new LinkedInConnector())
   JobBoardConnectorRegistry.register(new IndeedConnector())
-  JobBoardConnectorRegistry.register(new NationaleVacaturebankConnector())
-  JobBoardConnectorRegistry.register(new JobbirdConnector())
-  JobBoardConnectorRegistry.register(new MonsterboardConnector())
-  JobBoardConnectorRegistry.register(new WerkzoekenConnector())
-  JobBoardConnectorRegistry.register(new JoobleConnector())
+  for (const [key, name, logo] of feedBoards) {
+    JobBoardConnectorRegistry.register(new FeedJobBoardConnector(key, name, logo))
+  }
 }
 
 registerAllConnectors()

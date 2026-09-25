@@ -188,7 +188,7 @@ export default async function AdminDashboardPage() {
             <tbody>
               {needsAttention.map(({ v, badge, label }) => (
                 <tr key={v.id}>
-                  <td><Link href={`/admin/vacatures/${v.id}`} style={{ textDecoration: 'none' }}><b>{v.title}</b></Link><br /><small>{v.company.name}</small></td>
+                  <td><Link href={`/admin/vacatures/${v.id}`} style={{ textDecoration: 'none' }}><b>{v.title}</b></Link><br /><small>{v.company?.name ?? 'Eigen vacature'}</small></td>
                   <td><span className={`badge ${badge}`}>{label}</span></td>
                 </tr>
               ))}

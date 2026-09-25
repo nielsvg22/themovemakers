@@ -7,8 +7,6 @@ const connectors = [
   { name: 'Google for Jobs', text: 'Via JobPosting structured data', badge: 'b-green', status: 'Actief', actions: ['Controleer markup'] },
   { name: 'LinkedIn', text: 'ATS / Job Posting connector', badge: 'b-green', status: 'Verbonden', actions: ['Instellingen', 'Test'] },
   { name: 'Indeed', text: 'Job Sync API connector', badge: 'b-green', status: 'Verbonden', actions: ['Instellingen', 'Test'] },
-  { name: 'Nationale Vacaturebank', text: 'API/feed configuratie nog nodig', badge: 'b-gray', status: 'Niet gekoppeld', actions: ['Koppeling instellen'] },
-  { name: 'Jobbird', text: 'API/feed configuratie nog nodig', badge: 'b-gray', status: 'Niet gekoppeld', actions: ['Koppeling instellen'] },
 ]
 
 function actionClass(action: string) {

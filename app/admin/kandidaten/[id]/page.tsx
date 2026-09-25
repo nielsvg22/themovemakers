@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db/prisma'
 import { NoteForm, PlanKennismakingForm, StatusControl } from '@/components/admin/CandidateControls'
+import { CandidateEmailForm } from '@/components/admin/CandidateEmailForm'
 import { applicationStatusLabel, dateLabel, dateTimeLabel, profileStatusBadge, profileStatusLabel, sourceLabel } from '@/lib/admin/labels'
 
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,10 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
     },
   })
   if (!c) notFound()
+  const [templates, emails] = await Promise.all([
+    prisma.template.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true, subject: true, content: true } }),
+    prisma.emailLog.findMany({ where: { candidateId: c.id }, orderBy: { createdAt: 'desc' }, take: 10, select: { id: true, subject: true, status: true, createdAt: true } }),
+  ])
 
   const rows: [string, React.ReactNode][] = [
     ['E-mail', <a key="e" href={`mailto:${c.email}`}>{c.email}</a>],
@@ -88,7 +93,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                 <tbody>
                   {c.applications.map((a) => (
                     <tr key={a.id}>
-                      <td><b>{a.vacancy.title}</b><br /><small style={{ color: 'var(--muted)' }}>{a.vacancy.company.name} · via {a.source ? (sourceLabel[a.source] ?? a.source) : 'onbekend'}</small></td>
+                      <td><b>{a.vacancy.title}</b><br /><small style={{ color: 'var(--muted)' }}>{a.vacancy.company?.name ?? 'Eigen vacature'} · via {a.source ? (sourceLabel[a.source] ?? a.source) : 'onbekend'}</small></td>
                       <td>{dateLabel(a.appliedAt)}</td>
                       <td><span className="badge b-blue">{applicationStatusLabel[a.status]}</span></td>
                     </tr>
@@ -127,6 +132,20 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                     <div className="activity-icon">☎</div>
                     <div><p><b>{dateTimeLabel(a.startTime)}</b></p><small>{a.location}</small></div>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="card panel" id="mail">
+            <h3>E-mail sturen</h3>
+            <CandidateEmailForm candidateId={c.id} templates={templates} />
+            {emails.length > 0 && (
+              <div className="activity" style={{ marginTop: 16 }}>
+                {emails.map((m) => (
+                  <Link key={m.id} href={`/admin/emails/${m.id}`} className="activity-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="activity-icon">✉</div>
+                    <div><p>{m.subject}</p><small>{dateLabel(m.createdAt)} · {m.status.replace('_', ' ')}</small></div>
+                  </Link>
                 ))}
               </div>
             )}

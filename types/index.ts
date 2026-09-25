@@ -25,7 +25,7 @@ export interface VacancyWithRelations {
     name: string
     logo: string | null
     website?: string | null
-  }
+  } | null
   sector: {
     id: string
     name: string
