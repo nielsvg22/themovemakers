@@ -268,3 +268,25 @@ export async function changePassword(_: FormResult, fd: FormData): Promise<FormR
   await prisma.user.update({ where: { id: user.id }, data: { passwordHash: await hash(next, 12) } })
   return { ok: true, message: 'Wachtwoord gewijzigd.' }
 }
+
+/* ---------- Jobboard-feed ---------- */
+
+export type FeedTestResult = { ok: boolean; message: string; count?: number }
+
+/** Haalt de eigen jobfeed op en controleert of hij geldig is, zoals een jobboard dat zou doen. */
+export async function testJobFeed(): Promise<FeedTestResult> {
+  await requireStaffSession()
+  const { jobFeedUrl } = await import('@/lib/jobboards/feed-url')
+  const url = jobFeedUrl()
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: 'no-store' })
+    if (!res.ok) return { ok: false, message: `Feed niet bereikbaar (HTTP ${res.status}).` }
+    const xml = await res.text()
+    const count = (xml.match(/<job>/g) ?? []).length
+    if (!xml.startsWith('<?xml')) return { ok: false, message: 'De feed is geen geldige XML.' }
+    if (count === 0) return { ok: true, message: 'Feed is geldig, maar bevat nog geen actieve vacatures.', count: 0 }
+    return { ok: true, message: `Feed is geldig: ${count} ${count === 1 ? 'actieve vacature' : 'actieve vacatures'} gevonden.`, count }
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? `Feed-test mislukt: ${e.message}` : 'Feed-test mislukt.' }
+  }
+}

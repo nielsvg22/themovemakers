@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/db/prisma'
 import { ConnectorsGrid } from '@/components/admin/ConnectorsGrid'
+import { JobFeedPanel } from '@/components/admin/JobFeedPanel'
+import { jobFeedUrl } from '@/lib/jobboards/feed'
 import { dateTimeLabel } from '@/lib/admin/labels'
 import { getChannelLabel } from '@/lib/utils'
 
@@ -18,6 +20,7 @@ export default async function PublicatiesPage() {
         <Link className="btn primary" href="/admin/vacatures">Nieuwe publicatie</Link>
       </div>
       <ConnectorsGrid />
+      <JobFeedPanel feedUrl={jobFeedUrl()} />
       <div className="card panel" style={{ marginTop: 16, overflowX: 'auto' }}>
         <h3>Recente publicaties</h3>
         <table className="table">

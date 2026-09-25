@@ -101,6 +101,7 @@ export function getChannelLabel(channel: string): string {
     JOBSONLINE: 'Jobsonline',
     TWENTY4WERK: '24werk',
     NUBANEN: 'NuBanen',
+    JOOF: 'Joof',
   }
   return labels[channel] || channel
 }
@@ -121,6 +122,7 @@ export function getChannelIcon(channel: string): string {
     JOBSONLINE: 'J',
     TWENTY4WERK: '24',
     NUBANEN: 'N',
+    JOOF: 'J',
   }
   return icons[channel] || '📋'
 }

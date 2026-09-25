@@ -30,8 +30,15 @@ const boards: { key: JobBoardChannel; name: string; note: string; connected: boo
   { key: 'GOOGLE_FOR_JOBS', name: 'Google for Jobs', note: 'Automatisch via structured data', connected: true },
   { key: 'LINKEDIN', name: 'LinkedIn', note: 'Testmodus (API-koppeling nodig)', connected: true },
   { key: 'INDEED', name: 'Indeed', note: 'Testmodus (API-koppeling nodig)', connected: true },
-  { key: 'NATIONALE_VACATUREBANK', name: 'Nationale Vacaturebank', note: 'Niet gekoppeld', connected: false },
-  { key: 'JOBBIRD', name: 'Jobbird', note: 'Niet gekoppeld', connected: false },
+  { key: 'WERKZOEKEN_NL', name: 'Werkzoeken.nl', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'JOBBIRD', name: 'Jobbird', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'NATIONALE_VACATUREBANK', name: 'Nationale Vacaturebank', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'TOPVACATUREBANK', name: 'TopVacaturebank', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'JOBER', name: 'Jober', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'JOBSONLINE', name: 'Jobsonline', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'TWENTY4WERK', name: '24werk', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'NUBANEN', name: 'NuBanen', note: 'Automatisch via jobfeed', connected: true },
+  { key: 'JOOF', name: 'Joof', note: 'Automatisch via jobfeed', connected: true },
 ]
 
 const newActions = [
