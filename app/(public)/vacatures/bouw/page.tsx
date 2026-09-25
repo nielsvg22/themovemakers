@@ -2,6 +2,9 @@ import { Metadata } from 'next'
 import { PublicLayout } from '@/components/public/PublicLayout'
 import { SectorPage, SectorData } from './_components/SectorPage'
 import { images } from '@/lib/data/site'
+import { getPublicJobs } from '@/lib/data/vacancies'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Werken in de Bouw | Vacatures bouw',
@@ -23,16 +26,14 @@ const sectorData: SectorData = {
     name: 'Mark de Jong',
     title: 'Recruitmentspecialist Bouw & Civiel',
     image: images.recruiter,
-    phone: '055 - 000 00 01',
-    email: 'mark@themovemaker.nl',
   },
-  jobCount: 12,
 }
 
-export default function BouwPage() {
+export default async function BouwPage() {
+  const jobs = await getPublicJobs('Bouw')
   return (
     <PublicLayout>
-      <SectorPage sector={sectorData} />
+      <SectorPage sector={sectorData} jobs={jobs} />
     </PublicLayout>
   )
 }

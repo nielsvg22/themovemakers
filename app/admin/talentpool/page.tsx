@@ -1,38 +1,44 @@
-'use client'
+import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
+import { prisma } from '@/lib/db/prisma'
+import { profileStatusBadge, profileStatusLabel } from '@/lib/admin/labels'
 
-import { useState } from 'react'
+export const dynamic = 'force-dynamic'
 
-const talent = [
-  { name: 'Jeroen Kok', profile: 'Uitvoerder', skills: 'Bouw, BIM, Lean', region: 'Utrecht', available: 'Direct' },
-  { name: 'Anne Visser', profile: 'Werkvoorbereider', skills: 'Infra, AutoCAD', region: 'Rotterdam', available: '2 weken' },
-]
-
-export default function TalentpoolPage() {
-  const [query, setQuery] = useState('')
-  const [region, setRegion] = useState('')
-  const filtered = talent.filter(
-    (t) => (!region || t.region === region) && `${t.name} ${t.profile} ${t.skills}`.toLowerCase().includes(query.toLowerCase())
-  )
+export default async function TalentpoolPage({ searchParams }: { searchParams: Promise<{ q?: string; regio?: string }> }) {
+  const { q, regio } = await searchParams
+  const where: Prisma.CandidateWhereInput = {
+    profileStatus: { in: ['INTERESSANT', 'KANDIDATENPOOL', 'KENNISMAKING_GEPLAND', 'DOOR_NAAR_PROCEDURE'] },
+    ...(regio ? { city: { contains: regio, mode: 'insensitive' } } : {}),
+    ...(q ? { OR: ['currentRole', 'desiredRole', 'sector', 'motivation'].map((f) => ({ [f]: { contains: q, mode: 'insensitive' } })) } : {}),
+  }
+  const talent = await prisma.candidate.findMany({ where, orderBy: { updatedAt: 'desc' }, take: 200 })
 
   return (
     <>
       <div className="page-head">
-        <div><h1>Talentpool</h1><p>Vind geschikte kandidaten op skills, regio, ervaring en beschikbaarheid.</p></div>
+        <div><h1>Talentpool</h1><p>Kandidaten die interessant zijn beoordeeld, te vinden op functie, vakgebied en regio.</p></div>
       </div>
-      <div className="toolbar">
-        <input className="input" placeholder="Zoek skills of functie..." value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Zoek skills of functie" />
-        <select value={region} onChange={(e) => setRegion(e.target.value)} aria-label="Regio">
-          <option value="">Alle regio&apos;s</option><option>Utrecht</option><option>Rotterdam</option>
-        </select>
-        <select aria-label="Beschikbaarheid"><option>Beschikbaar</option><option>Binnen 1 maand</option></select>
-      </div>
-      <div className="card panel">
+      <form className="toolbar" action="/admin/talentpool">
+        <input className="input" name="q" defaultValue={q} placeholder="Zoek functie of vakgebied..." aria-label="Zoek functie of vakgebied" />
+        <input className="input" name="regio" defaultValue={regio} placeholder="Regio of plaats" aria-label="Regio" />
+        <button className="btn dark" type="submit">Zoeken</button>
+      </form>
+      <div className="card panel" style={{ overflowX: 'auto' }}>
         <table className="table">
-          <thead><tr><th>Naam</th><th>Profiel</th><th>Skills</th><th>Regio</th><th>Beschikbaar</th></tr></thead>
+          <thead><tr><th>Naam</th><th>Profiel</th><th>Vakgebied</th><th>Regio</th><th>Beschikbaar</th><th>Status</th></tr></thead>
           <tbody>
-            {filtered.map((t) => (
-              <tr key={t.name}><td>{t.name}</td><td>{t.profile}</td><td>{t.skills}</td><td>{t.region}</td><td>{t.available}</td></tr>
+            {talent.map((t) => (
+              <tr key={t.id}>
+                <td><Link href={`/admin/kandidaten/${t.id}`}><b>{t.firstName} {t.lastName}</b></Link></td>
+                <td>{t.currentRole ?? t.desiredRole ?? '—'}{t.yearsExperience && <small style={{ display: 'block', color: 'var(--muted)' }}>{t.yearsExperience}</small>}</td>
+                <td>{t.sector ?? '—'}</td>
+                <td>{t.city ?? '—'}</td>
+                <td>{t.availability ?? '—'}</td>
+                <td><span className={`badge ${profileStatusBadge[t.profileStatus]}`}>{profileStatusLabel[t.profileStatus]}</span></td>
+              </tr>
             ))}
+            {talent.length === 0 && <tr><td colSpan={6} style={{ color: 'var(--muted)' }}>Nog geen kandidaten in de talentpool.</td></tr>}
           </tbody>
         </table>
       </div>

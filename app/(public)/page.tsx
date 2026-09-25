@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
 import { PublicLayout } from '@/components/public/PublicLayout'
+import { KennismakenBlock } from '@/components/public/CandidateBlocks'
+import { getSectorCounts } from '@/lib/data/vacancies'
 import { Hero } from './_components/Hero'
 import { SectorGrid } from './_components/SectorGrid'
 import { DualCta } from './_components/DualCta'
@@ -10,23 +12,28 @@ import { ApproachSteps } from './_components/ApproachSteps'
 import { MarketingStrip } from './_components/MarketingStrip'
 import { CaseStudies } from './_components/CaseStudies'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Recruitment voor bouw, civiel & techniek',
   description: 'Wij verbinden vakspecialisten en bedrijven in de bouw, civiel, techniek en meer. Met de juiste mensen maken we samen Nederland sterker.',
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { counts } = await getSectorCounts()
   return (
     <PublicLayout>
       <Hero />
 
       <section>
         <div className="container">
-          <SectorGrid />
+          <SectorGrid counts={counts} />
           <DualCta />
           <PartnerLogos />
         </div>
       </section>
+
+      <KennismakenBlock />
 
       <EmployerHero />
 

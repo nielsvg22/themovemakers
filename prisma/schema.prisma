@@ -45,6 +45,17 @@ enum ApplicationStatus {
   AFGEWEZEN
 }
 
+/// Voorselectie van kandidaten: eerst profiel beoordelen, daarna pas een korte kennismaking.
+enum ProfileStatus {
+  NIEUW_PROFIEL
+  TE_BEOORDELEN
+  INTERESSANT
+  KENNISMAKING_GEPLAND
+  NIET_PASSEND
+  KANDIDATENPOOL
+  DOOR_NAAR_PROCEDURE
+}
+
 enum PublicationStatus {
   CONCEPT
   IN_WACHTRIJ
@@ -223,6 +234,7 @@ model Vacancy {
   postalCode         String?
   country            String               @default("Nederland")
   description        String               @db.Text
+  image              String?
   responsibilities   String?              @db.Text
   requirements       String?              @db.Text
   benefits           String?              @db.Text
@@ -260,45 +272,53 @@ model Vacancy {
 }
 
 model Candidate {
-  id            String        @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String        @unique
-  phone         String?
-  city          String?
-  province      String?
-  postalCode    String?
-  linkedin      String?
-  desiredRole   String?
-  sector        String?
-  region        String?
-  salaryMin     Int?
-  salaryMax     Int?
-  availability  String?
-  skills        String[]
-  experience    String?
-  education     String?
-  cvUrl         String?
-  cvFileName    String?
-  motivation    String?       @db.Text
-  internalNotes String?       @db.Text
-  source        String?
-  sourceDetail  String?
-  gdprConsent   Boolean       @default(false)
-  gdprConsentAt DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  applications  Application[]
-  activities    Activity[]
-  notes         Note[]
-  documents     Document[]
-  jobAlerts     JobAlert[]
-  tasks         Task[]
-  appointments  Appointment[]
+  id              String        @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String        @unique
+  phone           String?
+  city            String?
+  province        String?
+  postalCode      String?
+  linkedin        String?
+  desiredRole     String?
+  currentRole     String?
+  yearsExperience String?
+  sector          String?
+  region          String?
+  salaryMin       Int?
+  salaryMax       Int?
+  availability    String?
+  skills          String[]
+  experience      String?
+  education       String?
+  cvUrl           String?
+  cvFileName      String?
+  motivation      String?       @db.Text
+  internalNotes   String?       @db.Text
+  profileStatus   ProfileStatus @default(TE_BEOORDELEN)
+  /// Voorkeursmoment voor een korte telefonische kennismaking
+  callPreference  String?
+  lastSubmittedAt DateTime?
+  source          String?
+  sourceDetail    String?
+  gdprConsent     Boolean       @default(false)
+  gdprConsentAt   DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  applications    Application[]
+  activities      Activity[]
+  notes           Note[]
+  documents       Document[]
+  jobAlerts       JobAlert[]
+  tasks           Task[]
+  appointments    Appointment[]
+  cvFiles         CvFile[]
 
   @@index([email])
   @@index([sector])
   @@index([region])
+  @@index([profileStatus])
   @@map("candidates")
 }
 
@@ -621,4 +641,20 @@ model JobBoardConfig {
   updatedAt  DateTime        @updatedAt
 
   @@map("job_board_configs")
+}
+
+/// Geüploade cv's. In de database opgeslagen zodat ze privé blijven; alleen te
+/// downloaden via een beveiligde admin-route.
+model CvFile {
+  id          String    @id @default(cuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  fileName    String
+  mimeType    String
+  size        Int
+  data        Bytes
+  createdAt   DateTime  @default(now())
+
+  @@index([candidateId])
+  @@map("cv_files")
 }

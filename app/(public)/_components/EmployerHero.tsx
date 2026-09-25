@@ -25,7 +25,7 @@ export function EmployerHero({
           <div className="hero-ctas">
             <ActionButton open="scan">Bespreek mijn vacature →</ActionButton>
             {asPageTitle ? (
-              <ActionButton className="btn btn-outline" toast="Kennismaking aangevraagd">Plan een kennismaking →</ActionButton>
+              <Link href="/contact" className="btn btn-outline">Plan een kennismaking →</Link>
             ) : (
               <Link href="/voor-werkgevers" className="btn btn-outline">Bekijk onze diensten →</Link>
             )}

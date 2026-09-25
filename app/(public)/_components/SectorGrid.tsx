@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { homeSectors, sectorHref } from '@/lib/data/site'
 
-export function SectorGrid() {
+export function SectorGrid({ counts }: { counts: Record<string, number> }) {
   return (
     <>
       <div className="section-head">
@@ -17,7 +17,7 @@ export function SectorGrid() {
             <img src={s.img} alt="" />
             <div className="content">
               <h3>{s.name}</h3>
-              <div className="count">{s.count} vacatures</div>
+              <div className="count">{counts[s.name] ?? 0} {counts[s.name] === 1 ? 'vacature' : 'vacatures'}</div>
               <div className="arrow">→</div>
             </div>
           </Link>

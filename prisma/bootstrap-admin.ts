@@ -4,21 +4,27 @@ import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { hash } from 'bcryptjs'
+import { seedDemo } from './demo-data'
 
 async function main() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase()
   const password = process.env.ADMIN_PASSWORD
 
-  if (!email || !password) {
-    console.log('ℹ️  ADMIN_EMAIL/ADMIN_PASSWORD niet gezet: geen admin aangemaakt.')
-    return
-  }
-  if (password.length < 12) {
+  if (password && password.length < 12) {
     throw new Error('ADMIN_PASSWORD moet minstens 12 tekens lang zijn.')
   }
 
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) })
   try {
+    // Lege database: vul één keer met demo-inhoud (uit te zetten met DEMO_CONTENT=false).
+    if (process.env.DEMO_CONTENT !== 'false' && (await prisma.vacancy.count()) === 0) {
+      console.log('🌱 Demo-inhoud toegevoegd:', await seedDemo(prisma))
+    }
+
+    if (!email || !password) {
+      console.log('ℹ️  ADMIN_EMAIL/ADMIN_PASSWORD niet gezet: geen admin aangemaakt.')
+      return
+    }
     const existing = await prisma.user.findUnique({ where: { email } })
     if (existing) {
       console.log(`✅ Admin ${email} bestaat al.`)
