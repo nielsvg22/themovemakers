@@ -3,12 +3,6 @@ import { PageHero } from '@/components/public/PageHero'
 import { ServicesGrid } from '@/app/(public)/_components/ServicesGrid'
 import { images } from '@/lib/data/site'
 
-const team = [
-  { name: 'Niels van Gortel', role: 'Founder & Recruiter', image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80' },
-  { name: 'Mark de Jong', role: 'Recruitmentspecialist Bouw & Civiel', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80' },
-  { name: 'Lisa Bakker', role: 'Recruitmentspecialist Techniek', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80' },
-]
-
 const values = [
   { icon: '◉', title: 'Specialisme', text: 'We kennen de bouw, civiel en techniek sector door en door.' },
   { icon: '♡', title: 'Persoonlijk', text: 'Geen standaardoplossingen, maar maatwerk voor kandidaat en klant.' },
@@ -41,19 +35,14 @@ export function OverOnsPage() {
           <ServicesGrid services={values} />
         </div>
       </section>
-      <section style={{ background: '#f7f8f8' }}>
+      <section style={{ paddingTop: 0 }}>
         <div className="container">
-          <div className="section-head">
-            <div><h2>Ons team</h2></div>
-            <Link href="/contact" className="btn btn-primary btn-sm">Neem contact op →</Link>
-          </div>
-          <div className="case-grid">
-            {team.map((m) => (
-              <div key={m.name} className="case-card">
-                <div className="case-img" style={{ height: 260 }}><img src={m.image} alt={m.name} /></div>
-                <div className="case-body"><h3>{m.name}</h3><p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 6 }}>{m.role}</p></div>
-              </div>
-            ))}
+          <div className="open-cta">
+            <div>
+              <h3>Kennismaken?</h3>
+              <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 5 }}>Of je nu een baan of personeel zoekt: we denken graag met je mee.</p>
+            </div>
+            <Link href="/contact" className="btn btn-dark btn-sm">Neem contact op →</Link>
           </div>
         </div>
       </section>

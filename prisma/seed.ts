@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { PrismaClient, UserRole, VacancyStatus, ContractType, WorkMode, ApplicationStatus, JobBoardChannel } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { hash } from 'bcryptjs'

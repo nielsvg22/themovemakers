@@ -1,3 +1,5 @@
+// Prisma 7 leest .env niet meer zelf in.
+import 'dotenv/config'
 import { defineConfig } from 'prisma/config'
 
 export default defineConfig({

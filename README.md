@@ -118,8 +118,7 @@ npm install
 cp .env.example .env
 # Bewerk .env met je DATABASE_URL en NEXTAUTH_SECRET
 
-# 4. Database setup
-npm run db:generate
+# 4. Database setup (maakt tabellen aan, genereert de Prisma-client en vult testdata)
 npm run db:push
 npm run db:seed
 
@@ -223,6 +222,7 @@ Tailwind (v4, zonder preflight) is alleen nog nodig voor de losse componenten in
 - De database-URL staat in `prisma.config.ts` (leest `DATABASE_URL`), niet meer in `schema.prisma`.
 - De client verbindt via `@prisma/adapter-pg` (zie `lib/db/prisma.ts`).
 - Seeden gaat via `tsx`: `npm run db:seed`.
+- `npm run dev`, `build`, `db:push` en `db:seed` draaien automatisch `prisma generate` (Prisma 7 doet dat niet meer zelf).
 
 ## 📄 Licentie
 

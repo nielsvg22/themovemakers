@@ -52,3 +52,6 @@ logs/
 
 # OS
 Thumbs.db
+# Door Next.js gegenereerde agent-instructies
+AGENTS.md
+CLAUDE.md
