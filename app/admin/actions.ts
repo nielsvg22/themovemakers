@@ -194,3 +194,40 @@ export async function publishToChannels(vacancyId: string, channels: JobBoardCha
   refresh()
   return results.map((r) => ({ channel: r.channel, success: r.success, error: r.error }))
 }
+
+const emailSettingsSchema = z.object({
+  apiKey: z.string().trim().max(200).optional(),
+  from: z.string().trim().min(3, 'Vul een afzender in').max(200),
+  notifyTo: z.string().trim().email('Vul een geldig e-mailadres in').or(z.literal('')),
+  testInbox: z.string().trim().email('Vul een geldig e-mailadres in').or(z.literal('')),
+  testMode: z.string().optional(),
+})
+
+export async function saveEmailSettingsAction(_: ActionState, formData: FormData): Promise<ActionState> {
+  await requireStaffSession()
+  const parsed = emailSettingsSchema.safeParse(Object.fromEntries(formData.entries()))
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? 'Controleer de velden.' }
+  const d = parsed.data
+  if (d.apiKey && !d.apiKey.startsWith('re_')) return { ok: false, message: 'Een Resend API-sleutel begint met "re_".' }
+  const testMode = d.testMode === 'on'
+  if (testMode && !d.testInbox) return { ok: false, message: 'Vul een testmailbox in, of zet de testmodus uit.' }
+  const { saveEmailSettings } = await import('@/lib/email/settings')
+  await saveEmailSettings({ apiKey: d.apiKey || undefined, from: d.from, notifyTo: d.notifyTo, testMode, testInbox: d.testInbox })
+  refresh()
+  return { ok: true, message: 'Instellingen opgeslagen.' }
+}
+
+export async function sendTestEmailAction(): Promise<ActionState> {
+  const session = await requireStaffSession()
+  const { getEmailSettings } = await import('@/lib/email/settings')
+  const { sendEmail } = await import('@/lib/email/send')
+  const { testEmail } = await import('@/lib/email/templates')
+  const s = await getEmailSettings()
+  const to = s.testInbox || s.notifyTo || session.user.email
+  if (!to) return { ok: false, message: 'Geen ontvanger: vul een testmailbox of meldingsadres in.' }
+  const log = await sendEmail({ type: 'test', to, ...testEmail() })
+  refresh()
+  return log.status === 'verzonden'
+    ? { ok: true, message: `Testmail verzonden naar ${log.to}.` }
+    : { ok: false, message: `Niet verzonden: ${log.error ?? log.status}` }
+}

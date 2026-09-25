@@ -231,13 +231,22 @@
   & .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0 }
   & .btn:disabled { opacity: .6; cursor: wait; transform: none }
   & .approach.cols-4 { grid-template-columns: repeat(4, 1fr) }
+  & .approach.cols-3 { grid-template-columns: repeat(3, 1fr) }
+  & .apply-grid { grid-template-columns: 1.4fr 1fr }
   & .services-grid.cols-3 { grid-template-columns: repeat(3, 1fr) }
   @media (max-width: 840px) {
     & .approach.cols-4 { grid-template-columns: 1fr 1fr }
+    & .approach.cols-3, & .apply-grid { grid-template-columns: 1fr }
     & .services-grid.cols-3 { grid-template-columns: 1fr }
   }
   /* afwijking: lange keuzelijsten mogen formulieren niet breder maken dan het scherm */
   & .forms-grid > *, & .form-grid > * { min-width: 0 }
+  & .consent { grid-column: 1/-1; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #40515b }
+  & .consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--navy); flex: none }
+  & .consent a { font-weight: 800; text-decoration: underline }
+  & .next-steps { display: grid; gap: 14px; margin-top: 6px }
+  & .next-steps .stepdot { font-size: 14px; color: #40515b; align-items: flex-start }
+  & .next-steps .stepdot .dot { flex: none; background: var(--navy); color: #fff; font-size: 12px }
   & .alert-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
   & .alert-inline .form-error { flex-basis: 100%; margin-top: 0 }
   & .form-intro { font-size: 13px; color: var(--muted); margin: -8px 0 16px }

@@ -91,7 +91,7 @@ export function OpenSollicitatieForm({ onSuccess }: { onSuccess?: () => void }) 
   )
 }
 
-/** Solliciteren op een vacature: één kort formulier, alleen wat nodig is om een eerste inschatting te maken. */
+/** Solliciteren op een vacature: kort en overzichtelijk; LinkedIn en toelichting zijn optioneel. */
 export function ApplyForm({ vacancySlug, vacancyTitle }: { vacancySlug: string; vacancyTitle: string }) {
   return (
     <ActionForm
@@ -99,15 +99,21 @@ export function ApplyForm({ vacancySlug, vacancyTitle }: { vacancySlug: string; 
       hidden={{ vacancySlug }}
       submitLabel="Verstuur sollicitatie →"
       successTitle="Bedankt voor je sollicitatie."
-      successText={`We hebben je sollicitatie voor ${vacancyTitle} ontvangen. We bekijken je profiel en nemen contact op als je achtergrond aansluit.`}
+      successText={`We hebben je sollicitatie voor ${vacancyTitle} ontvangen.`}
     >
       <div className="form-grid">
         <Field name="firstName" label="Voornaam" required autoComplete="given-name" />
         <Field name="lastName" label="Achternaam" required autoComplete="family-name" />
         <Field name="email" label="E-mailadres" type="email" required autoComplete="email" />
         <Field name="phone" label="Telefoonnummer" type="tel" required autoComplete="tel" />
+        <Field name="city" label="Woonplaats (optioneel)" autoComplete="address-level2" />
+        <Field name="linkedin" label="LinkedIn-profiel (optioneel)" type="url" placeholder="https://linkedin.com/in/..." />
         <CvUpload required />
-        <Field name="motivation" label="Wil je nog iets toevoegen? (optioneel)" textarea rows={3} full />
+        <Field name="motivation" label="Motivatie of toelichting (optioneel)" textarea rows={4} full placeholder="Waarom spreekt deze functie je aan?" />
+        <label className="consent full">
+          <input type="checkbox" name="consent" required />
+          <span>Ik geef The Move Maker toestemming mijn gegevens te gebruiken voor deze sollicitatie. Zie de <a href="/privacy" target="_blank">privacyverklaring</a>.</span>
+        </label>
       </div>
     </ActionForm>
   )
