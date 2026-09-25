@@ -20,7 +20,7 @@ export default async function PublicatiesPage() {
         <Link className="btn primary" href="/admin/vacatures">Nieuwe publicatie</Link>
       </div>
       <ConnectorsGrid />
-      <JobFeedPanel feedUrl={jobFeedUrl()} />
+      <JobFeedPanel feedUrl={jobFeedUrl()} boardFeedUrl={jobFeedUrl} />
       <div className="card panel" style={{ marginTop: 16, overflowX: 'auto' }}>
         <h3>Recente publicaties</h3>
         <table className="table">

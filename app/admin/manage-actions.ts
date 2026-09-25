@@ -274,10 +274,10 @@ export async function changePassword(_: FormResult, fd: FormData): Promise<FormR
 export type FeedTestResult = { ok: boolean; message: string; count?: number }
 
 /** Haalt de eigen jobfeed op en controleert of hij geldig is, zoals een jobboard dat zou doen. */
-export async function testJobFeed(): Promise<FeedTestResult> {
+export async function testJobFeed(channel?: string): Promise<FeedTestResult> {
   await requireStaffSession()
   const { jobFeedUrl } = await import('@/lib/jobboards/feed-url')
-  const url = jobFeedUrl()
+  const url = jobFeedUrl(channel)
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: 'no-store' })
     if (!res.ok) return { ok: false, message: `Feed niet bereikbaar (HTTP ${res.status}).` }

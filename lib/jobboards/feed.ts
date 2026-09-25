@@ -1,4 +1,5 @@
 import 'server-only'
+import type { JobBoardChannel } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
 import { siteUrl } from '@/lib/email/templates'
 export { jobFeedUrl } from './feed-url'
@@ -22,13 +23,26 @@ const workModeMap: Record<string, string> = {
  * zoals Werkzoeken.nl, Jobbird, Jobsonline, Jober, NuBanen, 24werk, TopVacaturebank en Joof).
  * Deze boards halen vacatures zelf periodiek op zodra de feed-URL eenmalig bij ze is
  * aangemeld; er bestaat voor deze boards geen publieke push-API per vacature.
+ *
+ * De naam van de opdrachtgever gaat hier bewust nooit mee: extern gepubliceerde feeds
+ * tonen altijd "The Move Maker" als werkgever, ongeacht welk bedrijf intern aan de
+ * vacature is gekoppeld.
+ *
+ * Met een `channel` toont de feed alleen vacatures die voor dát specifieke board actief
+ * zijn gepubliceerd (via de "Publiceer"-modal); zonder `channel` alle actieve vacatures
+ * (algemene/testfeed).
  */
-export async function buildJobFeedXml() {
+export async function buildJobFeedXml(channel?: JobBoardChannel) {
   const baseUrl = siteUrl()
 
   const vacancies = await prisma.vacancy.findMany({
-    where: { status: 'ACTIEF', publishedAt: { not: null }, expiresAt: { gte: new Date() } },
-    include: { company: true, sector: true },
+    where: {
+      status: 'ACTIEF',
+      publishedAt: { not: null },
+      expiresAt: { gte: new Date() },
+      ...(channel ? { publications: { some: { channel, status: 'LIVE' } } } : {}),
+    },
+    include: { sector: true },
     orderBy: { publishedAt: 'desc' },
     take: 1000,
   })
@@ -44,7 +58,7 @@ export async function buildJobFeedXml() {
     <job>
       <id>${vacancy.id}</id>
       <title><![CDATA[${vacancy.title}]]></title>
-      <company><![CDATA[${vacancy.company?.name ?? 'The Move Maker'}]]></company>
+      <company><![CDATA[The Move Maker]]></company>
       <location><![CDATA[${vacancy.location}${vacancy.city ? `, ${vacancy.city}` : ''}]]></location>
       <description><![CDATA[${vacancy.description}]]></description>
       <url>${baseUrl}/vacatures/${vacancy.slug}</url>
