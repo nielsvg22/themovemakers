@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 export function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin'
+  // Alleen interne paden toestaan, zodat de login niet als open redirect te misbruiken is.
+  const requested = searchParams.get('callbackUrl') ?? ''
+  const callbackUrl = requested.startsWith('/') && !requested.startsWith('//') ? requested : '/admin'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -23,8 +24,9 @@ export function LoginForm() {
       if (result?.error) {
         setError('Ongeldige e-mail of wachtwoord')
       } else {
-        router.push(callbackUrl)
-        router.refresh()
+        // Volledige paginalading: een client-side navigatie hergebruikt de eerder
+        // onthouden redirect van /admin naar /login, waardoor je op het inlogscherm bleef.
+        window.location.assign(callbackUrl)
       }
     } catch {
       setError('Er is een fout opgetreden. Probeer opnieuw.')
