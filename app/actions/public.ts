@@ -2,9 +2,12 @@
 
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { after } from 'next/server'
+import { sendEmail, notifyAddress } from '@/lib/email/send'
+import { candidateConfirmation, leadConfirmation, leadNotification, recruiterNotification } from '@/lib/email/templates'
 import { prisma } from '@/lib/db/prisma'
 
-export type FormState = { ok: boolean; message?: string; errors?: Record<string, string> } | null
+export type FormState = { ok: boolean; message?: string; errors?: Record<string, string>; redirectTo?: string } | null
 
 const MAX_CV_BYTES = 4 * 1024 * 1024
 const CV_TYPES = [
@@ -162,7 +165,21 @@ async function saveCandidate(formData: FormData, source: Source, opts: { require
     },
   })
 
+  // Bevestiging naar de kandidaat en melding naar de recruiter, na het antwoord (vertraagt het formulier niet).
+  after(async () => {
+    const confirmation = candidateConfirmation(source, data.firstName, vacancy?.title)
+    await sendEmail({ type: `bevestiging_${source}`, to: data.email, ...confirmation, candidateId: candidate.id })
+    const recruiter = await notifyAddress()
+    if (recruiter) {
+      const notification = recruiterNotification(source, { ...candidate, motivation: data.motivation }, vacancy?.title, Boolean(cv.file))
+      await sendEmail({ type: `melding_${source}`, to: recruiter, ...notification, replyTo: data.email, candidateId: candidate.id })
+    }
+  })
+
   revalidatePath('/admin', 'layout')
+  if (source === 'sollicitatie' && applicationId && data.vacancySlug) {
+    return { ok: true, redirectTo: `/vacatures/${data.vacancySlug}/solliciteren/bedankt?ref=${applicationId}` }
+  }
   return { ok: true } as FormState
 }
 
@@ -199,6 +216,11 @@ async function saveLead(formData: FormData, type: 'RECRUITMENT_SCAN' | 'CONTACT'
   const { name, ...rest } = parsed.data
   const [firstName, ...last] = name.split(/\s+/)
   await prisma.lead.create({ data: { type, firstName, lastName: last.join(' ') || '-', ...rest } })
+  after(async () => {
+    await sendEmail({ type: `bevestiging_${type.toLowerCase()}`, to: parsed.data.email, ...leadConfirmation(type, firstName) })
+    const recruiter = await notifyAddress()
+    if (recruiter) await sendEmail({ type: `melding_${type.toLowerCase()}`, to: recruiter, ...leadNotification(type, parsed.data), replyTo: parsed.data.email })
+  })
   revalidatePath('/admin', 'layout')
   return { ok: true }
 }

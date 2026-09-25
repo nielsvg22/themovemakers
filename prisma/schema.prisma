@@ -658,3 +658,31 @@ model CvFile {
   @@index([candidateId])
   @@map("cv_files")
 }
+
+/// Eenvoudige sleutel/waarde-instellingen (bijv. e-mailconfiguratie). Gevoelige waarden versleuteld.
+model AppSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+/// Log van alle uitgaande e-mails, zodat ze in de admin terug te zien zijn.
+model EmailLog {
+  id          String   @id @default(cuid())
+  type        String
+  to          String
+  /// Oorspronkelijke ontvanger als de testmodus de mail heeft omgeleid.
+  originalTo  String?
+  subject     String
+  html        String   @db.Text
+  status      String
+  providerId  String?
+  error       String?
+  candidateId String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("email_logs")
+}

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteUI } from '@/components/public/SiteUI'
-import { ApplyForm } from '@/components/public/CandidateForms'
 import { images, sectorHref, type Job } from '@/lib/data/site'
 
 export interface JobDetail extends Job {
@@ -49,7 +48,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 <span>{job.type}</span>
               </div>
             </div>
-            <a className="btn btn-primary" href="#solliciteren">Solliciteer op deze vacature →</a>
+            <Link className="btn btn-primary" href={`/vacatures/${job.slug}/solliciteren`}>Solliciteer op deze vacature →</Link>
           </div>
         </div>
       </div>
@@ -112,11 +111,13 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       </section>
 
       <div className="forms-zone" id="solliciteren">
-        <div className="container" style={{ maxWidth: 760 }}>
-          <div className="form-card">
-            <h3>Solliciteren op {job.title}</h3>
-            <p className="sub">Binnen een minuut geregeld: je gegevens en je cv. We bekijken je profiel en nemen contact op als je achtergrond aansluit.</p>
-            <ApplyForm vacancySlug={job.slug} vacancyTitle={job.title} />
+        <div className="container">
+          <div className="open-cta" style={{ marginTop: 0 }}>
+            <div>
+              <h3>Interesse in deze functie?</h3>
+              <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 5 }}>Solliciteren duurt ongeveer twee minuten: je gegevens en je cv, meer niet.</p>
+            </div>
+            <Link className="btn btn-dark" href={`/vacatures/${job.slug}/solliciteren`}>Solliciteer op deze vacature →</Link>
           </div>
         </div>
       </div>

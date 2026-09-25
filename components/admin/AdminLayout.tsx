@@ -18,6 +18,7 @@ const navigation = [
   { name: 'Agenda', href: '/admin/agenda' },
   { name: 'Taken', href: '/admin/taken' },
   { name: 'Templates', href: '/admin/templates' },
+  { name: 'Verzonden mails', href: '/admin/emails' },
   { name: 'Rapportages', href: '/admin/rapportages' },
   { name: 'Websitebeheer', href: '/admin/website' },
   { name: 'Instellingen', href: '/admin/instellingen' },

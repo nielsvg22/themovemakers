@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, ReactNode, startTransition, useActionState, useContext, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import type { FormState } from '@/app/actions/public'
 
 type Action = (state: FormState, formData: FormData) => Promise<FormState>
@@ -24,13 +25,19 @@ interface ActionFormProps {
 export function ActionForm({ action, children, submitLabel, actions, successTitle, successText, className, hidden, onSuccess }: ActionFormProps) {
   const [state, formAction, pending] = useActionState(action, null)
   const called = useRef(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (state?.ok && !called.current) {
       called.current = true
-      onSuccess?.()
+      if (state.redirectTo) router.push(state.redirectTo)
+      else onSuccess?.()
     }
-  }, [state, onSuccess])
+  }, [state, onSuccess, router])
+
+  if (state?.ok && state.redirectTo) {
+    return <p className="form-intro" role="status">Je sollicitatie is verstuurd…</p>
+  }
 
   if (state?.ok) {
     return (
